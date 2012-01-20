@@ -1,0 +1,451 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Workbook 7</title><link rel="stylesheet" href="style.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><p class="docheader"><b>Java 1A Practical Class</b></p><div class="article" title="Workbook 7"><div class="titlepage"><div><div><h2 class="title"><a name="id2362500"></a>Workbook 7</h2></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#sec:introduction">Introduction</a></span></dt><dt><span class="section"><a href="#id2619401">Handling events in Swing</a></span></dt><dt><span class="section"><a href="#id2628868">Playing a pattern</a></span></dt><dt><span class="section"><a href="#id2647161">Step and Speed</a></span></dt><dt><span class="section"><a href="#id2654830">Zoom</a></span></dt><dt><span class="section"><a href="#id2642941">Choosing a source location</a></span></dt><dt><span class="section"><a href="#id2647955">Selecting a pattern</a></span></dt><dt><span class="section"><a href="#id2638288">It's very slow</a></span></dt><dt><span class="section"><a href="#id2636616">Tick 7</a></span></dt></dl></div><div class="section" title="Introduction"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:introduction"></a>Introduction</h2></div></div></div><p>
+Last week you built your own graphical interface with Java Swing in order to make your program more accessible to other users. Unfortunately, whilst your interface looked pretty, it wasn't exactly functional! This week you will be adding code to make your application usable.
+</p><p>This is the last Programming in Java Workbook, but not the last class; there is another practical class next week. If you have enjoyed the course you might be interested in taking part in an Undergraduate Research Opportunities Programme (UROP) run by the Programming in Java Lecturers. The programme runs for ten weeks over the summer and this year will involve writing Java programs for Android mobile phones. All participants are paid a stipend to cover living costs; last year this was £2,200. Further details are available here: <a class="ulink" href="http://www.cl.cam.ac.uk/research/dtg/summer/" target="_top">http://www.cl.cam.ac.uk/research/dtg/summer/</a></p><div class="important" title="Important" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Important</h3><p>You may find Sun's Swing Tutorial helpful:</p><p><a class="ulink" href="http://java.sun.com/docs/books/tutorial/uiswing/" target="_top">http://java.sun.com/docs/books/tutorial/uiswing/</a></p><p>Remember to check the course website regularly for announcements and errata:</p><p><a class="ulink" href="http://www.cl.cam.ac.uk/teaching/current/ProgJava" target="_top">http://www.cl.cam.ac.uk/teaching/current/ProgJava</a></p></div></div><div class="section" title="Handling events in Swing"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2619401"></a>Handling events in Swing</h2></div></div></div><p>Almost all Graphical User Interface (GUI) libraries (of which
+Swing is just one) operate in an event-oriented manner.  This entails
+a mode of operation in which your program starts up and enters
+an <em class="firstterm">event loop</em> which services
+an <em class="firstterm">event queue</em>.  Events are added to the event
+queue in response to the mouse being clicked or the window needing to
+be redrawn.  The event loop consists of taking the next event from the
+queue and handling it and sleeping if there are no further events to
+handle. In Swing the event loop (and the background thread
+which handles it) are managed for you behind the scenes.</p><p>You have already written code which interacts with the event
+loop.  One example is the </p><pre class="programlisting">protected paintComponent(Graphics g)</pre><p> method which you overrode in <code class="code">GamePanel</code>.  This method is called on a
+component in response to a paint event (a request that the window be
+redrawn). Similarly, you have also written code which creates events.  One
+example is the call to <code class="code">repaint()</code> which you wrote in the display method in <code class="code">GamePanel</code>. Calling <code class="code">repaint()</code> does not actually do any painting. Instead, it simply inserts a paint event into the event queue.  This
+event is eventually serviced by the event loop which calls the <code class="code">paintComponent</code> method and the drawing gets done.</p><p>There are two things to take away from this.  Firstly, things
+get done in a GUI program by raising events and handling events.
+Secondly, anything you do in response to an event shouldn't take too
+long to execute.  If it does then the event loop will spend all its
+time running your program and so won't be able to handle events like
+drawing the window.  This is a common problem which you have most
+likely seen before in which a program seems to freeze up and fails to
+draw its window properly.  This isn't the fault of the operating
+system, or the GUI library, its the fault of the software developer
+who wrote the program.</p><p>Below is a simple program which demonstrates event handling in
+Swing. Read the code carefully in combination with the information in
+the subsequent paragraphs:
+</p><pre class="programlisting">package uk.ac.cam.your-crsid.tick7;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.BoxLayout;
+
+public class HelloActionWorld extends JFrame {
+
+ private JLabel label;
+
+ //an "inner" class which handles events of type "ActionEvent"
+ private class ButtonAction implements ActionListener {
+  public void actionPerformed(ActionEvent e) {
+   label.setText("Button pressed");        //update text shown in "label"
+  }
+ }
+
+ HelloActionWorld() {
+  super("Hello Action");                   //create window &amp; set title text
+  setDefaultCloseOperation(EXIT_ON_CLOSE); //close button on window quits app.
+
+  //configure the layout of the pane associated with this window as a "BoxLayout"
+  setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
+
+  label = new JLabel("Button unpressed");  //create graphical text label
+  add(label);                              //associate "label" with window
+  JButton button = new JButton("Press me");//create graphical button
+  add(button);                             //associated "button" with window
+
+  //add a new instance of "ButtonAction" as an event handler for "button"
+  button.addActionListener(new ButtonAction());
+
+  setSize(320,240);                        //set size of window
+ }
+
+ public static void main(String[] args) {
+  HelloActionWorld hello = new HelloActionWorld(); //create instance
+  hello.setVisible(true);                          //display window to user
+ }
+}
+</pre><p>
+</p><p>The interesting line here is </p><pre class="programlisting">button.addActionListener(new ButtonAction());</pre><p> This registers a new event handler on the button created above.
+This means that when the user clicks the mouse on the button, the
+operating system will pass an event to Swing indicating that this has
+occurred.  This event goes into the event queue.  The event loop will
+eventually collect this event from the queue, work out which component
+it applies to (the button) and then call the <code class="code">ActionListener</code>s (of which
+there can be many) associated with that button.  The <code class="code">ActionListener</code> is an
+interface defined in the Java Standard Library (just like <code class="code">World</code> is an
+interface defined in another library).  The <code class="code">ActionListener</code> interface
+proscribes a single method:
+
+</p><pre class="programlisting">void actionPerformed(ActionEvent e);</pre><p>
+
+Classes which implement this interface must provide an implementation
+of this method.  This method then gets called in response to an event
+occurring on the component for which the <code class="code">ActionListener</code> has been
+registered.</p><p>The <code class="code">ActionListener</code> interface is implemented with
+an <em class="firstterm">inner class</em>
+called <code class="code">ButtonAction</code>. Inner classes are defined inside
+their parent class and have access to all the fields and methods in
+the parent (even private ones).  Inner classes are non-static by
+default.  This means you should think of them as inner-objects.  All
+the <span class="emphasis"><em>instance</em></span> members of the parent object are
+available in the inner-object.  For example, if you look closely at
+<code class="code">ButtonAction</code> class you will see it refers
+to <code class="code">label</code> which is an instance variable of the parent
+class.  If you needed to write the full name for <code class="code">label</code>
+out explicitly you would
+write <code class="code">HelloActionWorld.this.label</code>.  If you
+wrote <code class="code">this.label</code> you would have a compile error
+because <code class="code">this</code> refers to the inner-class rather than the
+parent. It is also possible to make an inner-class static.  In this case
+it cannot refer to any instance members of the parent class.</p><p>You could instead define a normal class in a separate file
+for <code class="code">ButtonAction</code>.  This is not desirable because the two 
+classes work closely together and so access to private
+members is useful.  It would be possible to pass
+a <span class="emphasis"><em>reference</em></span> to <code class="code">label</code> to another
+object rather than using an inner class, however, in more complex examples,
+the inner class might need to access many different parts of the
+parent class and it would be very tedious to have to pass them all
+explicitly.</p><p> The remainder of the <code class="code">HelloActionWorld</code> class is
+similar to <code class="code">HelloSwingWorld</code> that you saw last week, the
+new bits being the specification of a vertical box layout as the
+layout manager of the class, the addition of a <code class="code">JButton</code> to
+the graphical interface, and the addition of an instance
+of <code class="code">ButtonAction</code> as the event handler
+to <code class="code">button</code>.</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p> Copy the code for <code class="code">HelloActionWorld</code> into a new file with a suitable name and directory structure. Compile and run the program and click on the button labelled "Press me".</p></li><li class="listitem"><p> Create a new field of type <code class="code">int</code> called <code class="code">count</code> inside <code class="code">ButtonAction</code> and initialise <code class="code">count</code> to zero. Increment <code class="code">count</code> every time the button is pressed, and use the value of <code class="code">count</code> to update the text of the label to read "<code class="code">Button pressed <span class="emphasis"><em>n</em></span> time(s)</code>" where <code class="code"><span class="emphasis"><em>n</em></span></code> is the number of times the button has been pressed.</p></li></ol></div></div><p>A further improvement on inner classes are <em class="firstterm">anonymous
+inner classes</em>.  These allow us to define the inner class
+at the point of use (rather than as a class member) and avoid naming
+it at all. Consider the following example (and try it out if you like):
+
+</p><pre class="programlisting">public class AnonTest1 {
+
+  private static class A {
+     public void print() { System.out.println("I am A!"); }
+  }
+
+  public static void main(String[] args) {
+     A instance1 = new A();
+     instance1.print();
+
+     A instance2 = new A() {
+       public void print() { System.out.println("I am more than A!"); }
+     };
+     instance2.print();
+  }
+}
+</pre><p>
+
+This program defines a <span class="emphasis"><em>static</em></span> inner class called <code class="code">A</code>
+which has a single method <code class="code">print()</code>.  The <code class="code">main</code> function creates an instance of <code class="code">A</code>
+and calls <code class="code">print</code>.  This does the obvious thing.  The <code class="code">main</code> function then
+creates a second instance of <code class="code">A</code> but overrides
+the <code class="code">print</code> method—this is an
+anonymous inner class.  It is still possible to assign our anonymous inner class
+to a variable of type <code class="code">A</code> because the inner class
+implicitly <span class="emphasis"><em>extends</em></span> <code class="code">A</code>.</p><p>Here is another example which uses a non-static inner class.  If
+you want to try this out remember to put <code class="code">AnonTest2</code> and <code class="code">AnonTest2Run</code> in
+separate, appropriately named files.
+
+</p><pre class="programlisting">public class AnonTest2 {
+  private int counter;
+
+  public class A { // A is visible outside of AnonTest2
+    private A() {} // A can only be constructed inside AnonTest2
+    public void print() { System.out.println("A: "+counter); }
+  }
+
+  public AnonTest2() {
+    counter = 0;
+  }
+
+  public void incrementCounter() {
+    counter++;
+  }
+
+  public A getA() {
+    A instance1 = new A();
+    return instance1;
+  }
+
+  public A getSpecialA() {
+    A instance2 = new A() {
+     public void print() { System.out.println("Special: "+counter); }
+    };
+    return instance2;
+  }
+}
+</pre><p>
+
+</p><pre class="programlisting">public class AnonTest2Run {
+
+  public static void main(String[] args) {
+    AnonTest2 anonTest = new AnonTest2();
+
+    AnonTest2.A instance1 = anonTest.getA();
+    AnonTest2.A instance2 = anonTest.getSpecialA();
+
+    instance1.print();
+    instance2.print();
+
+    anonTest.incrementCounter();
+
+    instance1.print();
+    instance2.print();
+  } 
+}
+</pre><p>
+
+This program creates an inner class <code class="code">A</code> which prints
+out the parent class' counter and also extends <code class="code">A</code> using an
+anonymous inner class. As a final example here is an alternative form of <code class="code">HelloActionWorld</code> with <code class="code">ButtonAction</code> rewritten as an anonymous inner class:
+</p><pre class="programlisting">package uk.ac.cam.your-crsid.tick7;
+import javax.swing.JFrame;       import java.awt.event.ActionListener;
+import javax.swing.JLabel;       import java.awt.event.ActionEvent;
+import javax.swing.JButton;      import javax.swing.BoxLayout;
+
+public class HelloActionWorld2 extends JFrame {
+ private JLabel label;
+
+ HelloActionWorld2() {
+  super("Hello Action");                   //create window &amp; set title text
+  setDefaultCloseOperation(EXIT_ON_CLOSE); //close button on window quits app.
+  //configure the layout of the pane associated with this window as a "BoxLayout"
+  setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
+  label = new JLabel("Button unpressed");  //create graphical text label
+  add(label);                              //associate "label" with window
+  JButton button = new JButton("Press me");//create graphical button
+  add(button);                             //associated "button" with window
+  //create an instance of an anonymous inner class to hand the event
+  button.addActionListener(new ActionListener(){
+   public void actionPerformed(ActionEvent e) {
+    label.setText("Button has been pressed");
+   }
+  });
+  setSize(320,240);                        //set size of window
+ }
+</pre><p>
+</p><pre class="programlisting"> public static void main(String[] args) {
+  HelloActionWorld2 hello = new HelloActionWorld2(); //create instance
+  hello.setVisible(true);                          //display window to user
+ }
+}
+</pre><p>
+</p><p>Notice the phrase "<code class="code">new ActionListener(){</code>" which is then followed by any fields and methods which should be specified inside the body of the anonymous inner class; in this case there is a single method <code class="code">actionPerformed</code>, but in general there can be multiple methods and fields inside an anonymous inner class, just as you find inside a normal class definition. This anonymous inner class provides an implementation for the interface <code class="code">ActionListener</code>; you can also use the anonymous inner class syntax to provide a sub-class of an abstract class and provide implementations of all the abstract methods.</p><p>If you wish to refer to a local variable from within the body of
+an anonymous inner class, then the variable must be be prefixed with
+the keyword <code class="code">final</code>. (The <code class="code">final</code> keyword states
+that this variable can only reference the current object and cannot be
+changed to reference a different object.  The object itself can be
+changed but this variable can not.)  You may reference a field in the
+containing class from within the anonymous inner class without
+declaring it to be <code class="code">final</code>; the field <code class="code">label</code>
+above is one such example.</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="3" type="1"><li class="listitem"><p> Copy the code for <code class="code">HelloActionWorld2</code> into a new file with a suitable name and directory structure. Compile and run the program and click on the button labelled "Press me".</p></li><li class="listitem"><p> Make the declaration of the field <code class="code">label</code> found in <code class="code">HelloActionWorld</code> into a local variable by deleting the field definition and declaring a local variable in the constructor called <code class="code">label</code> of type <code class="code">JLabel</code>. Compile the modified program. The compiler will complain that <code class="code">label</code> is non-final. Make <code class="code">label</code> "final" by prefixing the declaration with the keyword <code class="code">final</code> and recompile.</p></li><li class="listitem"><p> Create a new field of type <code class="code">int</code> called <code class="code">count</code> inside the anonymous inner class and initialise <code class="code">count</code> to zero. Increment <code class="code">count</code> every time the button is pressed, and use the value of <code class="code">count</code> to update the text of the label to read "<code class="code">Button pressed <span class="emphasis"><em>n</em></span> time(s)</code>" where <code class="code"><span class="emphasis"><em>n</em></span></code> is the number of times the button has been pressed.</p></li></ol></div></div></div><div class="section" title="Playing a pattern"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2628868"></a>Playing a pattern</h2></div></div></div><p>In the last section you copied and modified a piece of code which contained an event handler class which implemented an <code class="code">ActionListener</code>. In this section you will apply the methods you learnt in the previous section to begin to implement event handlers for your graphical version of the <code class="code">Game of Life</code>. In order to play a pattern in the Game of Life, you need to update the Game Panel at regular intervals. To do this you should create an instance of the <code class="code">javax.swing.Timer</code> class and use the regular events the <code class="code">Timer</code> class generates to update the Game Panel. Below are some sample fields and methods which are compatible with the <code class="code">GuiLife</code> class you wrote last week:
+</p><pre class="programlisting">public class GuiLife {
+
+  //...
+
+  private World world;
+  private int timeDelay = 500; //delay between updates (millisecs)
+  private int timeStep = 0;    //progress by (2 ^ timeStep) each time
+
+  private Timer playTimer = new Timer(timeDelay, new ActionListener() {
+
+   public void actionPerformed(ActionEvent e) {
+    doTimeStep();
+   }
+
+  });
+
+  void doTimeStep() {
+   if (world != null) {
+    world = world.nextGeneration(timeStep);
+    gamePanel.display(world);
+   }
+  }
+
+  //...
+}
+</pre><p>
+</p><p>In the code above, <code class="code">playTimer</code> will generate a new event of type <code class="code">ActionEvent</code> every <code class="code">timeDelay</code> milliseconds. The anonymous inner class associated with <code class="code">playTimer</code> will call the method <code class="code">doTimeStep</code> every time an event is fired. The <code class="code">playTimer</code> needs to be started before it will start producing events; this can be done by calling the method <code class="code">start</code> with no arguments on <code class="code">playTimer</code>.</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="6" type="1"><li class="listitem"><p> Copy across your implementation of <code class="code">GuiLife</code> from last week, together with all the classes which <code class="code">GuiLife</code> depends on, into the package <code class="code">uk.ac.cam.your-crsid.tick7</code>.</p></li><li class="listitem"><p> Include the additional code shown above in the body of the class <code class="code">GuiLife</code>; you will need to add suitable import statements for <code class="code">Timer</code>, <code class="code">ActionListener</code>, and <code class="code">ActionEvent</code>.</p></li><li class="listitem"><p> Your implementation of the static main method inside <code class="code">GuiLife</code> last week contained a local variable called <code class="code">w</code> of type <code class="code">World</code>. Delete the local variable <code class="code">w</code> and use the field called <code class="code">world</code> of type <code class="code">World</code> which you added in the previous step instead. (This is required so that the method <code class="code">doTimeStep</code> can access a reference to the correct instance of <code class="code">World</code>.)</p></li><li class="listitem"><p> Start <code class="code">playTimer</code> by calling the <code class="code">start</code> method in the static main method just before the call to <code class="code">setVisible</code>. (Hint: since <code class="code">playTimer</code> is not a static field, you will need to access the field from the instance of <code class="code">GuiLife</code> you have already created called <code class="code">gui</code>.)</p></li><li class="listitem"><p> Compile and run your code. The Game Panel should now animate the Game of Life.</p></li></ol></div></div></div><div class="section" title="Step and Speed"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2647161"></a>Step and Speed</h2></div></div></div><p>In the previous section you animated the Game of Life, but the speed of the animation and the number of steps before the display was updated was fixed to 500 ms and 2<sup>0</sup>=1 in the variables <code class="code">timeDelay</code> and <code class="code">timeStep</code> respectively. In this section you will add event handlers to the widgets representing speed and the number of steps to update these variables dynamically.</p><p>There are a variety of different approaches which can be used to connect the event handlers associated with updates from the sliders to <code class="code">playTimer</code>. One reasonably neat strategy is to add abstract methods to the Control Panel which are called when the value of the slider is changed, then create an anonymous inner class inside <code class="code">GuiLife</code> which implements these abstract methods and updates the <code class="code">playTimer</code> object and <code class="code">timeStep</code> field. For example, to add support for the speed slider, first make your implementation of Control Panel an abstract class by prefixing the class declaration for <code class="code">ControlPanel</code> with the keyword <code class="code">abstract</code> and add the following abstract method to the class <code class="code">ControlPanel</code>:
+</p><pre class="programlisting">protected abstract void onSpeedChange(int value);
+</pre><p>
+</p><p>Then call the abstract method from within the body of a <code class="code">ChangeListener</code> event handler by placing the following code into the constructor for <code class="code">ControlPanel</code> after the initialisation of <code class="code">speedSlider</code>:
+</p><pre class="programlisting">  speedSlider.addChangeListener(new ChangeListener() {
+  public void stateChanged(ChangeEvent e) {
+   if (!speedSlider.getValueIsAdjusting())
+    onSpeedChange(speedSlider.getValue());
+   }
+  });
+</pre><p>
+</p><p>Finally modify your implementation of <code class="code">createControlPanel</code> in <code class="code">GuiLife</code> as follows:
+</p><pre class="programlisting">  private JComponent createControlPanel() { 
+    controlPanel = new ControlPanel(){
+     protected void onSpeedChange(int value) {
+      playTimer.setDelay(1+(100-value)*10);
+     }
+    };
+    addBorder(controlPanel,Strings.PANEL_CONTROL);
+    return controlPanel;
+  }
+</pre><p>
+</p><p>Notice the body of <code class="code">createControlPanel</code> now creates an anonymous inner class which extends <code class="code">ControlPanel</code> and provides an implementation for the method <code class="code">onSpeedChange</code>. Since this code is inside the body of <code class="code">GuiLife</code>, then the method <code class="code">onSpeedChange</code> can call <code class="code">setDelay</code> on <code class="code">playTimer</code> to update the rate at which the Game Panel is updated.</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="11" type="1"><li class="listitem"><p> Update your implementation of <code class="code">ControlPanel</code> and <code class="code">GuiLife</code> as suggested above. Run your program and confirm that changing the speed slider does indeed change the speed of playback. (Hint: You'll need to import <code class="code">ChangeListener</code> and <code class="code">ChangeEvent</code>.)</p></li><li class="listitem"><p> Update your implementation of <code class="code">ControlPanel</code> and <code class="code">GuiLife</code> so that changes in the step slider will change the number of steps the game board will iterate through before the display is updated. (Hint: you should create a new abstract method called <code class="code">onStepChange</code> inside <code class="code">ControlPanel</code> and your implementation of it in the anonymous inner class in <code class="code">GuiLife</code> should update the value of <code class="code">timeStep</code> appropriately.) Run your program and confirm that changing the step slider does indeed change the number of steps specified by the slider before the game board is updated in the Game Panel.</p></li></ol></div></div></div><div class="section" title="Zoom"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2654830"></a>Zoom</h2></div></div></div><p>Updating the zoom level is very similar to the methodology used earlier for speed and step. The only additional difficulty is the need to update the private field <code class="code">zoom</code> which is associated with the <code class="code">GamePanel</code> object. This requirement can be addressed by adding a new method called <code class="code">setZoom</code> to the <code class="code">GamePanel</code> object which takes a single argument of type <code class="code">int</code> and returns nothing; the body of the <code class="code">setZoom</code> method should update the field <code class="code">zoom</code> with the value of the single argument provided to the method. The method <code class="code">setZoom</code> can then be called from within <code class="code">GuiLife</code> by calling <code class="code">setZoom</code> on the field <code class="code">gamePanel</code>.</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="13" type="1"><li class="listitem"><p> Write a method called <code class="code">setZoom</code> on the class <code class="code">GamePanel</code>. The method should take a single argument of type <code class="code">int</code> and return nothing; the body of the <code class="code">setZoom</code> method should update the private field <code class="code">zoom</code> with the value of the argument passed to the method.</p></li><li class="listitem"><p> Add a <code class="code">ChangeListener</code> object to handle events from the <code class="code">zoomSlider</code> in <code class="code">ControlPanel</code>. Changes in the slider should call an abstract method called <code class="code">onZoomChange</code> in the same way as <code class="code">onSpeedChange</code> and <code class="code">onStepChange</code> were handled earlier.</p></li><li class="listitem"><p> Provide an implementation for the abstract method <code class="code">onZoomChange</code> inside the body of an anonymous inner class defined in <code class="code">GuiLife</code>. The implementation should call <code class="code">setZoom</code> on the field <code class="code">gamePanel</code> to change the zoom level of the Game Panel.</p></li><li class="listitem"><p> Update the creation of <code class="code">zoomSlider</code> inside <code class="code">ControlPanel</code> so that the value of the zoom slider is initially <code class="code">10</code>.</p></li></ol></div></div></div><div class="section" title="Choosing a source location"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2642941"></a>Choosing a source location</h2></div></div></div><p>In this section you will restructure your code to support the functionality defined in the Source Panel. This will be done in five steps:
+
+</p><div class="itemizedlist"><ul class="itemizedlist" type="disc" compact><li class="listitem"><p>Add a method called <code class="code">getCurrentPattern</code> to the Pattern Panel to access the current pattern (if any) displayed to the user.</p></li><li class="listitem"><p>Add some extra code to the <code class="code">setPatterns</code> method in <code class="code">PatternPanel</code> to permit an argument with the value <code class="code">null</code> indicating that no valid patterns were found.</p></li><li class="listitem"><p>Move most of the required "startup" code to initialise variables from the <code class="code">main</code> method in <code class="code">GuiLife</code> into a new private method called <code class="code">resetWorld</code> so that the state of the application can be reset whenever the user selects a new source of input.</p></li><li class="listitem"><p>Add appropriate event handlers and abstract methods to <code class="code">SourcePanel</code> to update the application whenever the user changes one of the input sources.</p></li><li class="listitem"><p>Add an anonymous inner class which extends <code class="code">SourcePanel</code> to the method <code class="code">createSourcePanel</code> in <code class="code">GuiLife</code>, providing an implementation of each of the abstract methods defined in <code class="code">SourcePanel</code>.</p></li></ul></div><p>
+You will now work through the restructuring in more detail in the rest of this section of the Workbook.
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="17" type="1"><li class="listitem"><p> Add a private field of type <code class="code">Pattern</code> called <code class="code">currentPattern</code> to <code class="code">PatternPanel</code>.</p></li><li class="listitem"><p> Initialise the value of <code class="code">currentPattern</code> to <code class="code">null</code> in the constructor for <code class="code">PatternPanel</code>.</p></li><li class="listitem"><p> Write a public method called <code class="code">getCurrentPattern</code> in <code class="code">PatternPanel</code> which takes no arguments and returns a reference of type <code class="code">Pattern</code>. The body of <code class="code">getCurrentPattern</code> should return the value of the private field <code class="code">currentPattern</code>.</p></li></ol></div></div><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="20" type="1"><li class="listitem"><p> Add the following code snippet to the <span class="emphasis"><em>beginning</em></span> of the method <code class="code">setPatterns</code>:
+</p><pre class="programlisting">    if (list == null) {
+     currentPattern = null; //if list is null, then no valid pattern
+     guiList.setListData(new String[]{}); //no list item to select
+     return;
+    }
+</pre><p>
+</p></li><li class="listitem"><p> Add the following code snippet to the <span class="emphasis"><em>end</em></span> of the method <code class="code">setPatterns</code>:
+</p><pre class="programlisting">    currentPattern = list.get(0); //select first element in list
+    guiList.setSelectedIndex(0);  //select first element in guiList
+</pre><p>
+</p></li><li class="listitem"><p> Compile and run your program to make sure it still works; the first element of the list should now be selected when your program starts.</p></li></ol></div></div><p>A new method called <code class="code">resetWorld</code> in <code class="code">GuiLife</code> should be added to <code class="code">GuiLife</code> to provide a generic method of resetting the state of the application if a new source is selected in the Source Panel. The method should be written as follows:
+</p><pre class="programlisting">  private void resetWorld() {
+   Pattern current = patternPanel.getCurrentPattern();
+   world = null;
+   if (current != null) {
+    try {
+     world = controlPanel.initialiseWorld(current);
+    } catch (PatternFormatException e) {
+     JOptionPane.showMessageDialog(this,
+      "Error initialising world",
+      "An error occurred when initialising the world. "+e.getMessage(),
+      JOptionPane.ERROR_MESSAGE);
+    }
+   }
+   gamePanel.display(world);
+   repaint();
+  }
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="23" type="1"><li class="listitem"><p> Add the <code class="code">resetWorld</code> method as defined above to your implementation of <code class="code">GuiLife</code>.</p></li><li class="listitem"><p> Replace the <code class="code">main</code> method inside <code class="code">GuiLife</code> with the following:</p><pre class="programlisting">public static void main(String[] args) {
+    GuiLife gui = new GuiLife();
+    gui.playTimer.start();
+    gui.resetWorld();
+    gui.setVisible(true);
+  }
+</pre><p>
+</p></li></ol></div></div><p>In order to respond to changes in the radio buttons used in the Source Panel, you will need to add event handlers to each of the buttons. You should do this in a similar way to the ones that you've already completed for the previous parts of the user interface, namely add an event handler to <code class="code">SourcePanel</code> and from there call an abstract method, then in <code class="code">GuiLife</code> create an anonymous inner class which extends <code class="code">SourcePanel</code> and provides a suitable implementation. You should also add a new field called <code class="code">current</code> of type <code class="code">JRadioButton</code> to keep track of the current button the user has selected; this will be useful in the cases where the user selects a new source and that source doesn't work—for example, if the user selects the "file" radio button, and then presses cancel when asked to select a file, your application should revert the radio button to the one referenced by <code class="code">current</code> since the new selection wasn't completed successfully.</p><p>For example, in order to add support for the "file" radio button, you should add the following code to the constructor for <code class="code">SourcePanel</code>:
+</p><pre class="programlisting">    file.addActionListener(new ActionListener() {
+     public void actionPerformed(ActionEvent e) {
+      if (setSourceFile())
+       //successful: file found and patterns loaded
+       current = file; 
+      else
+       //unsuccessful: re-enable previous source choice
+       current.setSelected(true); 
+     }
+    });
+</pre><p>
+and you should add the following abstract method to the class <code class="code">SourcePanel</code>:
+</p><pre class="programlisting">protected abstract boolean setSourceFile(); 
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="25" type="1"><li class="listitem"><p> Add a private field called <code class="code">current</code> of type <code class="code">JRadioButton</code> to <code class="code">SourcePanel</code> and initialise the field to point to <code class="code">none</code> at the end of the constructor.</p></li><li class="listitem"><p> Make the class <code class="code">SourcePanel</code> an abstract class and add three protected abstract methods <code class="code">setSourceNone</code>, <code class="code">setSourceFile</code>, and <code class="code">setSourceLibrary</code>; each method should take no arguments and return a <code class="code">boolean</code>, just like the example <code class="code">setSourceFile</code> shown above.</p></li><li class="listitem"><p> Add three event handlers for the three radio buttons in <code class="code">SourcePanel</code> similar to the one shown above for handling a click event on the radio button <code class="code">file</code> above. You will need to prefix any variable which you refer to inside the body of the event handler with the keyword <code class="code">final</code>, or promote the variable to be a private field of the class.</p></li><li class="listitem"><p> Add suitable import statements to <code class="code">SourcePanel</code> so that <code class="filename">SourcePanel.java</code> compiles.</p></li></ol></div></div><p>In order to use your new version of <code class="code">SourcePanel</code> you will need to provide an implementation of each of the four abstract methods. Below is the code you should use to create a new instance of <code class="code">SourcePanel</code> inside the method <code class="code">createSourcePanel</code> found in <code class="code">GuiLife</code>. Make sure you understand how it works and are prepared to answer questions on it from your Assessor.
+</p><pre class="programlisting">    JPanel result = new SourcePanel(){
+     protected boolean setSourceFile() {
+      JFileChooser chooser = new JFileChooser();
+      int returnVal = chooser.showOpenDialog(this);
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+       File f = chooser.getSelectedFile();
+       try {
+        List&lt;Pattern&gt; list = PatternLoader.load(new FileReader(f));
+        patternPanel.setPatterns(list);
+        resetWorld();
+        return true;
+       } catch (IOException ioe) {}
+      }
+      return false;
+     }
+</pre><p>
+</p><pre class="programlisting">     protected boolean setSourceNone() {
+      world = null;
+      patternPanel.setPatterns(null);
+      resetWorld();
+      return true;
+     }
+     protected boolean setSourceLibrary() {
+      String u = "http://www.cl.cam.ac.uk/teaching/current/ProgJava/nextlife.txt";
+      return setSourceWeb(u);
+     }
+     private boolean setSourceWeb(String url) {
+      try {
+       List&lt;Pattern&gt; list = PatternLoader.loadFromURL(url);
+       patternPanel.setPatterns(list);
+       resetWorld();
+       return true;
+      } catch (IOException ioe) {}
+      return false;
+     }
+    };
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="29" type="1"><li class="listitem"><p> Update your copy of <code class="code">createSourcePanel</code> in <code class="code">GuiLife</code> to create an instance of type <code class="code">SourcePanel</code> using the definition of the anonymous inner class shown above.</p></li><li class="listitem"><p> Add the following import statements to <code class="code">GuiLife</code>:
+</p><pre class="programlisting">import javax.swing.JFileChooser;
+import java.io.File;
+import java.io.FileReader;
+</pre><p>
+</p></li><li class="listitem"><p> Compile and run your program. You should now be able to select between the four input sources and display the first pattern found in each source, except for "none" which should display no input sources in the Pattern Panel.</p></li></ol></div></div></div><div class="section" title="Selecting a pattern"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2647955"></a>Selecting a pattern</h2></div></div></div><p>The final piece of functionality missing so far is the ability to select a pattern using the Pattern Panel. Now that you have completed the rest of the code, this should be relatively easy given the following example event handler:
+</p><pre class="programlisting">    guiList.addListSelectionListener(new ListSelectionListener() {
+     public void valueChanged(ListSelectionEvent e) {
+      if (!e.getValueIsAdjusting() &amp;&amp; (patternList != null)) {
+       int sel = guiList.getSelectedIndex();
+       if (sel != -1) {
+        currentPattern = patternList.get(sel);
+        onPatternChange();
+       }
+      }
+     }
+    });
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="32" type="1"><li class="listitem"><p> Create a new field called <code class="code">patternList</code> in the class <code class="code">PatternPanel</code>. Change the method <code class="code">setPatterns</code> in the class <code class="code">PatternPanel</code> to update the field <code class="code">patternList</code> to reference the method argument <code class="code">list</code> whenever the <code class="code">setPatterns</code> method is called. (This will allow the event handler you write in the next step to access the list of patterns by referencing the field <code class="code">patternList</code>.)</p></li><li class="listitem"><p> Add the event handler shown above to the constructor of <code class="code">PatternPanel</code>.</p></li><li class="listitem"><p> Make the class <code class="code">PatternPanel</code> an abstract class and add an abstract method called <code class="code">onPatternChange</code> which should take no arguments and return no result.</p></li><li class="listitem"><p> Modify the declaration of <code class="code">patternPanel</code> inside the method <code class="code">createPatternPanel</code> in the class <code class="code">GuiLife</code> to create an anonymous inner class which provides an implementation of <code class="code">onPatternChange</code>. Your implementation of <code class="code">onPatternChange</code> should do only one thing: call the <code class="code">resetWorld</code> method. (This is sufficient since the <code class="code">resetWorld</code> method calls <code class="code">getCurrentPattern</code> to determine the current pattern and loads this pattern into the Game Panel.)</p></li><li class="listitem"><p> Test that your program works by loading a variety of patterns into it from disk and from the on-line library.</p></li></ol></div><p>You may have noticed that changing the storage type used in the <code class="code">ControlPanel</code> does not take effect until another pattern is selected in Pattern Panel or a new source is selected in the <code class="code">Source Panel</code>. This behaviour is acceptable in this course, but a more polished implementation would solve this difficulty.</p></div></div><div class="section" title="It's very slow"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2638288"></a>It's very slow</h2></div></div></div><p>Try loading the '1A Java Ticker' pattern from the library.  This
+is a pattern with the emergent behaviour that it displays a message
+across the screen.  You will find that you have to be very patient
+waiting for this message to appear.</p><p>HashLife is an algorithm invented by William Gosper which
+provides significantly faster execution than our simple algorithm.
+The algorithm itself is complicated and beyond the scope of this
+course but an implementation is provided for you which you can
+download from
+<a class="ulink" href="http://www.cl.cam.ac.uk/teaching/current/ProgJava/hashlife.jar" target="_top">http://www.cl.cam.ac.uk/teaching/current/ProgJava/hashlife.jar</a>.
+The documentation is available online at
+<a class="ulink" href="http://www.cl.cam.ac.uk/teaching/current/ProgJava/hashlife" target="_top">http://www.cl.cam.ac.uk/teaching/current/ProgJava/hashlife</a>.
+However, to make use of this code you only need to know that the jar file contains
+a class <code class="code">HashWorld</code> inside the
+package <code class="code">uk.ac.cam.acr31.life.hash</code> and that this class
+implements the <code class="code">World</code> interface.
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="37" type="1"><li class="listitem"><p> Download the jar file above and
+integrate <code class="code">HashWorld</code> into your program.  You should
+provide an additional radio button in the Control Panel to allow the user to
+select <code class="code">HashWorld</code>.</p></li></ol></div></div><p>This is an example of how important the choice of algorithm is
+to the execution speed of a program.  The <code class="code">ArrayLife</code> implementation will be
+faster than HashLife (and certainly consume less memory) on small
+worlds.  On large worlds (particularly sparse ones), HashLife is
+significantly faster.</p></div><div class="section" title="Tick 7"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2636616"></a>Tick 7</h2></div></div></div><p>To complete your tick you need to prepare a jar file with the contents of all the classes you have written in this workbook and email it to <code class="code">ticks1a-java@cl.cam.ac.uk</code>. Your jar file should contain:
+</p><pre class="programlisting">uk/ac/cam/your-crsid/tick7/AgingWorld.java
+uk/ac/cam/your-crsid/tick7/ArrayWorld.java
+uk/ac/cam/your-crsid/tick7/ControlPanel.java
+uk/ac/cam/your-crsid/tick7/GamePanel.java
+uk/ac/cam/your-crsid/tick7/GuiLife.java
+uk/ac/cam/your-crsid/tick7/HelloActionWorld.java
+uk/ac/cam/your-crsid/tick7/PackedLong.java
+uk/ac/cam/your-crsid/tick7/PackedWorld.java
+uk/ac/cam/your-crsid/tick7/PatternFormatException.java
+uk/ac/cam/your-crsid/tick7/Pattern.java
+uk/ac/cam/your-crsid/tick7/PatternLoader.java
+uk/ac/cam/your-crsid/tick7/PatternPanel.java
+uk/ac/cam/your-crsid/tick7/SourcePanel.java
+uk/ac/cam/your-crsid/tick7/Strings.java
+uk/ac/cam/your-crsid/tick7/WorldImpl.java
+</pre><p>
+together with <span class="emphasis"><em>all</em></span> the class files generated when you compile these source files. Do not include any of the contents of <code class="filename">world.jar</code> or <code class="filename">hashlife.jar</code>
+in your submission.  The submission system will continue to run
+throughout the vacation period, although our response to email queries might be a
+bit slower.</p><p>This concludes the Programming in Java course.  Please make sure
+you fill out a feedback form for the course and give it to your
+ticker.  The course lecturers are particularly interested in whether the practical class
+format has worked for you and whether the time and effort invested was
+worthwhile.</p></div></div><p class="docfooter">Copyright 2008-2012 Alastair R. Beresford and Andrew C. Rice</p></body></html>

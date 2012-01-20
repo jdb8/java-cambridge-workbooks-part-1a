@@ -1,0 +1,298 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Workbook 3</title><link rel="stylesheet" href="style.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><p class="docheader"><b>Java 1A Practical Class</b></p><div class="article" title="Workbook 3"><div class="titlepage"><div><div><h2 class="title"><a name="id2458824"></a>Workbook 3</h2></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#sec:introduction">Introduction</a></span></dt><dt><span class="section"><a href="#sec:arrays">Arrays</a></span></dt><dt><span class="section"><a href="#sec:pass-by-reference">References</a></span></dt><dt><span class="section"><a href="#sec:complete-arraylife">ArrayLife</a></span></dt><dt><span class="section"><a href="#sec:object-review">Review of object-oriented programming</a></span></dt><dd><dl><dt><span class="section"><a href="#sec:static-methods">Static fields and methods</a></span></dt><dt><span class="section"><a href="#sec:methods">Passing method arguments</a></span></dt><dt><span class="section"><a href="#sec:reserved-words">Naming conventions and reserved words</a></span></dt></dl></dd><dt><span class="section"><a href="#sec:strings">Strings</a></span></dt><dt><span class="section"><a href="#sec:objects">Writing your own Object</a></span></dt><dt><span class="section"><a href="#tick3">Java Tick 3</a></span></dt></dl></div><div class="section" title="Introduction"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:introduction"></a>Introduction</h2></div></div></div><p>Last week you built a working implementation of the Game of Life using your implementation of <code class="code">PackedLong</code> to store the state of the world in a variable of type <code class="code">long</code>. The use of <code class="code">PackedLong</code> limits the size of world you can store to an eight-by-eight grid of cells. This week you will learn about Java arrays which can be used to store arbitrary-sized blocks of data. You will use Java arrays to write a new version of the Game of Life which can store a world of an arbitary size.  As the size of the world gets bigger, initialising the world using a long value becomes inappropriate, so you will design your own object to store the initial starting pattern of the world and decode it from a simple string representation. By the end of this Workbook you should be familiar with creating and using arrays and objects, and the use of strings in Java. 
+</p><div class="important" title="Important" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Important</h3><p>The recommended text book for this course is <span class="emphasis"><em>Thinking in Java</em></span> by Bruce Eckel. You can download a copy of the 3rd Edition for free from Bruce's website:</p><p><a class="ulink" href="http://www.mindview.net/Books/TIJ/" target="_top">http://www.mindview.net/Books/TIJ/</a></p><p>Remember to check the course website regularly for announcements and errata:</p><p><a class="ulink" href="http://www.cl.cam.ac.uk/teaching/current/ProgJava" target="_top">http://www.cl.cam.ac.uk/teaching/current/ProgJava</a></p><p>You will find the Java standard library documentation useful:</p><p><a class="ulink" href="http://java.sun.com/javase/6/docs/api/" target="_top">http://java.sun.com/javase/6/docs/api/</a></p></div></div><div class="section" title="Arrays"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:arrays"></a>Arrays</h2></div></div></div><p>An array in Java is used to store a fixed number of elements of the same type. New arrays can be created either by using the Java <code class="code">new</code> operator or by using curly brackets (<code class="code">{</code> and <code class="code">}</code>) to provide an explicit list of initial values for the array. Here are two examples:
+
+</p><pre class="programlisting">//create a new array with five elements, each initialised to zero
+int[] intArray = new int[5]; 
+
+//create a new array and initialise the elements with the provided values
+long[] longArray = {1L, 2L}; 
+</pre><p>
+
+Note the use of the square brackets after the type to denote the fact that this is an array of values of the specified type. For example, <code class="code">int[]</code> tells the compiler that the variable <code class="code">intArray</code> is of type "array of ints" rather than simply "int".<sup>[<a name="id2714903" href="#ftn.id2714903" class="footnote">1</a>]</sup> You can only use the curly bracket notation when creating a <span class="emphasis"><em>new</em></span> variable of an array type; you cannot use it to update the values stored in an existing variable. For example:
+</p><pre class="programlisting">//This is okay; create new array with 4 elements
+long[] longArray = {1L, 2L, 3L, 4L};
+
+//This is wrong; you cannot update values in an array this way
+longArray = {1L, 2L, 3L, 4L};   
+</pre><p>
+</p><p>You might like to try this to see the error from the compiler. Square brackets are used to retrieve or update values stored in the array. By convention, the first element in the array has an index value of zero, not one. Here are some examples:
+</p><pre class="programlisting">//create a new array with five elements, each initialised to zero
+int[] intArray = new int[5];
+
+//set the value of the FIRST element to 2
+intArray[0] = 2;
+
+//set the value of the THIRD element to 9
+intArray[2] = intArray[0] + 7; 
+
+//increment the value stored in the FOURTH element to 1
+intArray[3]++;
+</pre><p>
+</p><p>The square bracket notation only permits a single array value to be updated at a time. Consequently it is a common to use a <code class="code">for</code> loop to update values stored in an array. Here is an example:
+</p><pre class="programlisting">int[] numbers = new int[5];
+for(int i=0; i&lt;numbers.length; i++)
+ numbers[i] = i;
+</pre><p>
+In the above example the <code class="code">for</code> loop is used to update each value of the "array of ints" <code class="code">numbers</code> in turn with the current value stored in the variable <code class="code">i</code>. Notice the use of the phrase <code class="code">numbers.length</code>; the value stored in the <code class="code">length</code> field is a <span class="emphasis"><em>read-only</em></span> value of the size of the array. It is a good idea to use the <code class="code">length</code> field when using Java arrays, rather than using literal values. For example, <code class="code">numbers.length</code> should be used rather than the literal <code class="code">5</code> because <code class="code">numbers.length</code> will always return the length of the array correctly, whereas <code class="code">5</code> might be wrong if you subsequently modify the size of the <code class="code">numbers</code> array later.
+</p><p>By creating a suitable directory structure and file of the correct name, create a class called <code class="code">FibonacciCache</code> inside the package <code class="code">uk.ac.cam.your-crsid.tick3</code>. Use the following code as the basis for writing the class <code class="code">FibonacciCache</code>:
+</p><pre class="programlisting">package uk.ac.cam.your-crsid.tick3;
+
+public class FibonacciCache {
+ //TODO: Test your program with values other than 20 as given here
+ public static long[] fib = new long[20];
+
+ public static void store() {
+  //TODO: using a for loop, fill "fib" with the Fibonacci numbers 
+  //      e.g. if length of "fib" is zero, store nothing; and
+  //           if length is six, store 1,1,2,3,5,8 in "fib"
+ }
+
+ public static void reset() {
+  //TODO: using a for loop, set all the elements of fib to zero
+ }
+ 
+ public static long get(int i) {
+  //TODO: return the value of the element in fib found at index i
+  //      e.g. "get(3)" should return the fourth element of fib
+  //
+  //Note: your code should check that i is within the bounds of fib
+  //      and if it is outside this range return the literal "-1L"
+ }
+}
+</pre><p>
+</p><div class="sidebar" title="Write an implementation of FibonacciCache"><p class="title"><b>Write an implementation of FibonacciCache</b></p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Complete the implementation of the three methods in <code class="code">FibonacciCache</code> following the instructions inside the comments.</p></li></ol></div><p>Hint: You will probably want to test your code by writing a "main" method and including some test code which uses your <code class="code">reset</code>, <code class="code">store</code> and <code class="code">get</code> implementations and checks they function correctly. Printing out the contents of <code class="code">fib</code> after performing each method call will probably help you find errors.</p></div></div><div class="section" title="References"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:pass-by-reference"></a>References</h2></div></div></div><p>In the Java programs you wrote for Workbooks 1 and 2, the types of the variables you used were all primitive types (i.e. <code class="code">boolean</code>, <code class="code">byte</code>, <code class="code">short</code>, <code class="code">char</code>, <code class="code">int</code>, <code class="code">long</code>, <code class="code">float</code> or <code class="code">double</code>). In Java, the mechanism used to store values in variables of primitive type differs from the mechanism used to store values of other types. Take a look at the following piece of Java code:
+</p><pre class="programlisting">class Reference {
+ public static void update(int i, int[] array) {
+  i++;
+  array[0]++;
+ }
+ public static void main(String[] args) {
+  int test_i = 1;
+  int[] test_array = {1};
+
+  update(test_i, test_array);
+
+  System.out.println(test_i);
+  System.out.println(test_array[0]);
+ }
+}
+</pre><p>
+
+It might surprise you to learn that this program prints out <code class="code">1</code> followed by <code class="code">2</code> to the terminal. Try it for yourself now.
+</p><p>The reason for the difference is that variables of primitive type store the value directly, where as variables for all other types in Java store a <span class="emphasis"><em>reference</em></span> to the location in memory in which the data is held. In the example above, when the method <code class="code">update</code> is called, the variable <code class="code">i</code> is initialised with a copy of the value of <code class="code">test_i</code>, so all updates to <code class="code">i</code> inside the body of the method are lost when the method finishes; in contrast, the variable <code class="code">array</code> is initialised with a <span class="emphasis"><em>reference</em></span> to the location in computer memory that <code class="code">test_array</code> also references, and this location in computer memory is used to store the contents of the array. Consequently, we say that primitive values in Java are <em class="firstterm">passed-by-value</em> and arrays (and as we shall see later, objects) in Java are <em class="firstterm">passed-by-reference</em>.</p><p>The ability to define references provides the possibility of referencing nothing at all. In Java, you can do this by pointing a reference to <code class="code">null</code> which is written as follows:
+
+</p><pre class="programlisting">int[] array = null;
+</pre><p>
+</p><p>You may update a reference field or variable in Java to point to <code class="code">null</code> at any point. This isn't an erroneous state, and can be useful, however since the reference does not refer to a valid array (or object), then you cannot access array elements (or object methods or fields); a program which attempts to do so will fail with an error when the program runs. For example, the following fails
+</p><pre class="programlisting">int[] array = {1,2,3};
+array = null;
+System.out.println(array[1]);
+</pre><p>
+because <code class="code">array</code> does not have a valid reference on the third line when the square brackets are used to find an element in the array.
+</p><p>In Java we can create two-, three- or higher-dimensional arrays. A Java two-dimensional array is simply an array of <span class="emphasis"><em>references</em></span> to one-dimensional arrays. Here are some example multi-dimensional array defintions:
+</p><pre class="programlisting">//create a 2-by-2 array with all values initialised to zero
+int[][] i = new int[2][2]; 
+
+//2D array of values with each 1D value of a different length
+int [][] j = {i[1],{1,2,3},{4,5,6,7}}; 
+
+//create a 3D array using two 2D array references
+int [][][] k = {i,j};
+</pre><p>
+
+</p><div class="figure"><a name="fig:array"></a><div class="figure-contents"><div class="mediaobject"><img src="figures/arrayreferencing.png" alt="Graphical representation of i, j and k."></div></div><p class="title"><b>Figure 1. Graphical representation of <code class="code">i</code>, <code class="code">j,</code> and <code class="code">k</code></b></p></div><p><br class="figure-break">
+
+The layout of data associated with variables <code class="code">i</code>, <code class="code">j</code> and <code class="code">k</code> is shown in <a class="xref" href="#fig:array" title="Figure 1. Graphical representation of i, j, and k">Figure 1, “Graphical representation of <code class="code">i</code>, <code class="code">j,</code> and <code class="code">k</code>”</a>. Notice that some of the data held in the arrays can be referenced using more than one variable. For example <code class="code">k[0][1][0]</code>, refers to the same piece of memory as <code class="code">j[0][0]</code>, <code class="code">i[1][0]</code> and even <code class="code">k[1][0][0]</code>! Consequently, updating the value stored using any reference will ensure the updated value is available through all other references. If a piece of data can be accessed through more than one reference, we say that the references are <em class="firstterm">aliased</em>. 
+</p><div class="sidebar" title="Write an implementation of ReferenceTest"><p class="title"><b>Write an implementation of ReferenceTest</b></p><p>By creating a suitable directory structure and file of the correct name, create a class called <code class="code">ReferenceTest</code> inside the package <code class="code">uk.ac.cam.your-crsid.tick3</code>. Enter the following code as the basis for the class <code class="code">ReferenceTest</code>:</p><pre class="programlisting">package uk.ac.cam.your-crsid.tick3;
+
+public class ReferenceTest {
+ public static void main(String[] args) {
+  //TODO: Insert the definitions of i,j and k as shown above here
+
+  System.out.println(k[0][1][0]++);
+  System.out.println(++k[1][0][0]);
+  System.out.println(i[1][0]);
+  System.out.println(--j[0][0]);
+ }
+}
+</pre><div class="orderedlist"><ol class="orderedlist" start="2" type="1"><li class="listitem"><p>Copy the definitions of <code class="code">i</code>, <code class="code">j</code>, and <code class="code">k</code> as defined earlier in this section of the workbook into the top of the <code class="code">main</code> method.</p></li><li class="listitem"><p>What do you think the program will print when it is executed? Execute the program to check. Your Ticker may ask you what the output of the program is next week.</p></li></ol></div></div></div><div class="section" title="ArrayLife"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:complete-arraylife"></a>ArrayLife</h2></div></div></div><p>Your next task is to write a new implementation of Conway's Game of Life, this time using a two-dimensional array of <code class="code">boolean</code>s to store the state of each cell, rather than using your implementation of <code class="code">PackedLong</code>. Using a two-dimensional array will allow you to simulate worlds which are larger than an eight-by-eight grid of cells. You should store your data in row order in the two-dimensional array, which means the first array index refers to height (<code class="code">row</code>) and the second index refers to width (<code class="code">col</code>); see the new version of <code class="code">getCell</code> below for a concrete example.</p><p>Copy the code you wrote last week in <code class="filename">TinyLife.java</code> into a file called <code class="filename">ArrayLife.java</code>, update the name of the class to <code class="code">ArrayLife</code>, and place the file inside the package <code class="code">uk.ac.cam.your-crsid.tick3</code>. You should also copy across your implementation of <code class="code">PackedLong</code> into the same package. To finish updating your implementation, change each of the method prototypes in your file to the following:
+
+</p><div class="itemizedlist"><ul class="itemizedlist" type="disc" compact><li class="listitem"><p><code class="code">public static boolean getCell(boolean[][] world, int col, int row)</code></p></li><li class="listitem"><p><code class="code">public static void setCell(boolean[][] world, int col, int row, boolean value)</code></p></li><li class="listitem"><p><code class="code">public static void print(boolean[][] world)</code></p></li><li class="listitem"><p><code class="code">public static int countNeighbours(boolean[][] world, int col, int row)</code></p></li><li class="listitem"><p><code class="code">public static boolean computeCell(boolean[][] world, int col, int row)</code></p></li><li class="listitem"><p><code class="code">public static boolean[][] nextGeneration(boolean[][] world)</code></p></li><li class="listitem"><p><code class="code">public static void play(boolean[][] world) throws Exception</code></p></li></ul></div><p>
+</p><p>Notice that <code class="code">setCell</code> does not return an updated version of <code class="code">world</code>. This is because arrays are passed by reference, so your implementation for this method can simply update the contents of <code class="code">world</code>, safe in the knowledge that these changes will be available when the method returns. <span class="emphasis"><em>If this concept troubles or puzzles you, please ask the Lecturer or Demonstrator to explain this to you—it's crucial that you understand this concept so don't feel afraid to ask for help!</em></span> You will now need to replace all calls to <code class="code">PackedLong.set</code> and <code class="code">PackedLong.get</code> with suitable operations on a two-dimensional array of booleans. For example, the <code class="code">getCell</code> method could be written as:
+</p><pre class="programlisting">public static boolean getCell(boolean[][] world, int col, int row) {
+ if (row &lt; 0 || row &gt; world.length - 1) return false;
+ if (col &lt; 0 || col &gt; world[row].length - 1) return false;
+
+ return world[row][col];
+}
+</pre><p>
+</p><p>Make sure you understand the difference between <code class="code">world.length</code> and <code class="code">world[row].length</code>. You must update the body of <span class="emphasis"><em>all</em></span> the methods in ArrayLife as listed above. Finally, replace your <code class="code">main</code> method with the following code:
+
+</p><pre class="programlisting">public static void main(String[] args) throws Exception {
+ int size = Integer.parseInt(args[0]);
+ long initial = Long.decode(args[1]);
+ boolean[][] world = new boolean[size][size];
+ //place the long representation of the game board in the centre of "world"
+ for(int i = 0; i &lt; 8; i++) {
+  for(int j = 0; j &lt; 8; j++) {
+   world[i+size/2-4][j+size/2-4] = PackedLong.get(initial,i*8+j);
+  }
+ }
+ play(world);
+}
+</pre><p>
+</p><p>You should then be able to try the game boards listed in Workbook 2 as follows:
+</p><pre class="programlisting">crsid@machine:~&gt; java uk.ac.cam.your-crsid.tick3.ArrayLife 12 0x1824428181422418
+</pre><p>
+In this case, you should see the five-phase oscillator in the centre of a 12-by-12 world. If you are not doing so already, you should make sure your code is presented in a neat and consistent style so that the structure of the different blocks (delimited by <code class="code">{</code> and <code class="code">}</code>) is clear. Please ask if you're having trouble with presentation.
+</p><div class="sidebar" title="Write an implementation of ArrayLife"><p class="title"><b>Write an implementation of ArrayLife</b></p><div class="orderedlist"><ol class="orderedlist" start="4" type="1"><li class="listitem"><p>Write an implementation of ArrayLife which, given an identical world and an 8-by-8 grid of cells, produces the same output as your implementation of TinyLife. Check this is the case by trying several game boards found in Workbook 2.</p></li></ol></div><p>Note: this kind of editing is called <em class="firstterm">refactoring</em> and is a common technique used by programmers. When you refactor something, you take a piece of code that works, improve or generalise the structure of the code in some way, and then test that it produces the same output as before.</p></div></div><div class="section" title="Review of object-oriented programming"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:object-review"></a>Review of object-oriented programming</h2></div></div></div><p>The Object-Oriented Programming course covers the essential concepts in object-oriented programming and provided some examples in Java. This section briefly reviews these concepts to give you the skills to improve your implementation of ArrayLife further.</p><p>An object is used to encapsulate both a data structure and a set of operations which can be performed on it. Data is stored in <em class="firstterm">fields</em>, and operations are written as <em class="firstterm">methods</em>. For example, we might like to create an object to represent a cell in the Game of Life. A cell object might have a field to record whether the cell is alive or dead; the same object can also provide methods for changing the state of the cell to "alive" or "dead".</p><p>An object-oriented programming language needs some method of describing an object, and in Java this is done by writing a <em class="firstterm">class</em>. To create objects which represent cells in the Game of Life, we would define a class to encapsulate the data (the current state of the cell, alive or dead) and the actions we can perform on it (changing the state of the cell to alive or dead); from a practical perspective we probably need a method of retrieving the current state of the cell too! Once we have a class definition we can create multiple instances of a class, each of which will have an independent data store.</p><p>One possible definition of a Cell object in Java is as follows:
+
+</p><pre class="programlisting">class Cell {
+ boolean alive;
+ Cell() {alive=false;}
+ boolean isAlive() {return alive;}
+ void create() {alive=true;}
+ void kill() {alive=false;}
+}
+</pre><p>
+where each of the lines in the above code perform the following actions:
+</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>The first line declares a new class called <code class="code">Cell</code>; the declaration includes everything between lines 2 and 6 and is terminated with the closing curly bracket (<code class="code">}</code>) on line 7.</p></li><li class="listitem"><p>The second line declares the desire for space in computer memory to store information which has the name <code class="code">alive</code> and has the type <code class="code">boolean</code>.</p></li><li class="listitem"><p>The third line is a constructor for the class (a method which is executed when an object of the class is created); in this case the constructor initialises the field <code class="code">alive</code> to <code class="code">false</code>.</p></li><li class="listitem"><p>The fourth line defines a method which returns the current state of the cell.</p></li><li class="listitem"><p>The fifth line defines a method which updates the state of the cell to alive.</p></li><li class="listitem"><p>The sixth line defines a method which updates the state of the cell to dead.</p></li></ul></div><p>
+</p><p>The definition of the class <code class="code">Cell</code> has not actually created any cell objects yet, it merely provides a schematic or plan of how to create them; we have created a new <em class="firstterm">type</em>. We can use a class definition to create multiple instances of a class which, as we've already seen, are often called objects. 
+</p><p>To make use of a class definition we need to create an instance of it (those familiar with Java might complain that there are some exceptions to this rule—<code class="code">static</code> fields and methods— but we'll ignore these for now). We also need some method of naming or referring to the specific instance, which is called a <em class="firstterm">reference</em>. Creating an instance of a class, and keeping a reference to it are distinct concepts in Java since it is often useful to have several references pointing to a single instance. In fact, you've already used references in Java earlier in this workbook in the context of Java arrays. If an instance of an object exists which has no reference to it, the programmer has no way of referring to it and it is therefore no longer useful; in this case the Java runtime can safely delete the instance. This process is called <em class="firstterm">garbage collection</em> and is handled automatically in Java.</p><p>We can create a new instance of an object by calling the class constructor, prefixed with the <code class="code">new</code> keyword; for example "<code class="code">new Cell()</code>". If our class definition does not contain any constructors, the Java compiler will create a default constructor for us; a default constructor takes no arguments. We can create space to store a reference which points to an object by writing the type (the name of the class) followed by a memorable name which we can use to refer to the reference, for example, "<code class="code">Cell cell1</code>"; this storage space is called a <em class="firstterm">field</em> if it appears inside the body of a class definition, or a <em class="firstterm">variable</em> if it appears inside the body of a method. A variable or field can reference an object in Java by using the assignment operator (<code class="code">=</code>), and we can do all these steps in one line, or separately:
+
+</p><pre class="programlisting">Cell cell1 = new Cell();
+Cell cell2;
+cell2 = new Cell();
+</pre><p>
+</p><p>
+In the above example, 
+</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>the first line creates a variable called <code class="code">cell1</code> of type <code class="code">Cell</code> and updates the contents of the variable to reference a new instance of the <code class="code">Cell</code> class.</p></li><li class="listitem"><p>The second line simply creates a new variable called <code class="code">cell2</code> which at this stage does not point to any instance;</p></li><li class="listitem"><p>the third line updates the variable <code class="code">cell2</code> so that it references a second instance of <code class="code">Cell</code>.</p></li></ul></div><p>As you will have seen in lectures, we can use variables or fields which reference objects to invoke methods and access fields on those objects.</p><div class="section" title="Static fields and methods"><div class="titlepage"><div><div><h3 class="title"><a name="sec:static-methods"></a>Static fields and methods</h3></div></div></div><p>Usually fields and methods are associated with instances of a class. In other words, each object has it's own copy of a field and method. Sometimes however you may want <span class="emphasis"><em>every</em></span> object or instance of a particular class to share the <span class="emphasis"><em>same</em></span> field or method. In this case you prefix the name of the field or method with the keyword <code class="code">static</code>.</p><p>Up until now you have only been using static methods. For example, the special <code class="code">main</code> method is declared <code class="code">static</code> because the Java runtime invokes it without creating an instance of the class which contains it. Because a static method or field is not associated with any particular instance, you refer to it by using the name of the class <span class="emphasis"><em>not</em></span> the name of the instance. For example, last week you wrote <code class="code">PackedLong.get</code> and <code class="code">PackedLong.set</code> to refer to static methods associated with the class <code class="code">PackedLong</code>.</p></div><div class="section" title="Passing method arguments"><div class="titlepage"><div><div><h3 class="title"><a name="sec:methods"></a>Passing method arguments</h3></div></div></div><p>Just as we have seen for Java arrays, arguments and return types of objects are passed using references to the same underlying object instance; therefore using an object instance as an argument to a method does <span class="emphasis"><em>not</em></span> make a copy of the object. As mentioned earlier in the second section of this Workbook, this is called <span class="emphasis"><em>call-by-reference</em></span>. Many procedural and object-oriented programming languages support this type of argument passing.</p><p>If you do not wish to return a value from a method, then specify a return type of <code class="code">void</code>. For example, the special main function you've seen in Java has a return type of <code class="code">void</code>. This is a bit like <code class="code">unit</code> in ML.</p></div><div class="section" title="Naming conventions and reserved words"><div class="titlepage"><div><div><h3 class="title"><a name="sec:reserved-words"></a>Naming conventions and reserved words</h3></div></div></div><p>You should now be able to write simple classes in Java which contain fields, methods and variables. You should choose names for such things carefully, partly because a good name for a class, method or variable will improve readability (and therefore is strongly encouraged from a software engineering perspective), but also because some phrases cannot be used for classes, methods, fields or variable names in Java. You may recall from Workbook 2 that the following names are <span class="emphasis"><em>reserved</em></span> words in Java:
+
+</p><pre class="programlisting">abstract   assert       boolean*   break      byte*       case      
+catch      char*        class*     const      continue    default    
+do         double*      else*      enum       extends     false*     
+final      finally      float*     for*       goto        if*           
+implements import       instanceof int*       interface   long*
+native     new*         null*      package*   private     protected 
+public*    return*      short*     static*    strictfp    super      
+switch     synchronized this       throw      throws      transient  
+true*      try          void*      volatile   while*
+
+</pre><p>
+</p><p><span class="emphasis"><em>The keywords marked with an asterisk (<code class="code">*</code>) are terms which you should recognise.</em></span></p><p>Using any of these words as a name for a class, method, field or variable name will result in a compile error. If you encounter this problem, the solution is to change the name so it is no longer a reserved word. You will learn what many of the other reserved words do in this course, but not all. Some of the advanced features of Java will not be taught until the second year.
+</p><p>Every class object has some built-in or special method names which you should also avoid using. These are:
+
+</p><pre class="programlisting">clone equals finalize getClass notify notifyAll toString wait
+</pre><p>
+
+You should avoid naming a method with one of these names unless you really know what you're doing. Unfortunately you may not get a compile error if you use one of these names for a method accidentally. This is because there are circumstances when you may wish to provide your own implementation of these methods. Therefore if your program appears to behave incorrectly, you should double-check to make sure none of your methods have one of these names.
+</p><p>By convention, class names in Java should start with an upper case letter, and variable, field and method names should begin with a lower case letter. Consistent use of capitalisation will help you differentiate between class names and variable names, and may also aid syntax highlighting in some editors.</p><p>This section reviewed important concepts and terminology. You should make sure you know what the following terms mean before continuing: class, instance, object, field, method, static, variable, constructor, garbage collection, pass-by-reference, pass-by-value, <code class="code">new</code>.</p></div></div><div class="section" title="Strings"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:strings"></a>Strings</h2></div></div></div><p>Your implementation of ArrayLife is still limited to initialising a game board with an eight-by-eight grid of cells because it uses values of type <code class="code">long</code> to initialise the world. To explore larger and more interesting worlds, you will need to use bigger patterns. To describe larger worlds you will use an instance of the standard library <code class="code">String</code> class. You can see the methods available for objects of type <code class="code">String</code> by looking them up in Sun's documentation. Do this now by visiting the following website</p><p><a class="ulink" href="http://java.sun.com/javase/6/docs/api/" target="_top">http://java.sun.com/javase/6/docs/api/</a></p><p>and find the <code class="code">String</code> class in the list of "All Classes" in the lower left-hand pane. You will need to refer to this documentation later in this tick. The <code class="code">String</code> class is used extensively in the Java library, and consequently has two special features of importance in this course. These are
+
+</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p>an instance of <code class="code">String</code> can be created without using the <code class="code">new</code> operator and a call to the constructor: simply place the string pattern inside double quotes, for example <code class="code">"Alastair Beresford";</code></p></li><li class="listitem"><p>the addition operator, when combined with a string, can be used to convert and append variables or literals of another type to a string, for example <code class="code">"The University of Cambridge is "+800+" years old"</code> creates a new string whose contents is <code class="code">The University of Cambridge is 800 years old</code>.</p></li></ul></div><p>
+</p><p>A Java <code class="code">String</code> is immutable, so the contents cannot be updated after initialisation; instead, all methods associated with String object create a new instance of the <code class="code">String</code> class which contains the relevant updates. Here are some example ways of creating <code class="code">String</code> objects and variables which reference them:
+</p><pre class="programlisting">String s1 = new String("Cambridge");
+String s2 = s1; //s2 and s1 now reference the same object instance
+String s3 = "University of "; //new instance of String, but no "new" operator!
+String s4 = s3 + s2; //concatenate two strings
+String upper = s4.toUpperCase(); //Note: contents of s4 is distinct from upper
+String lower = "University of Cambridge".toLowerCase();
+</pre><p>
+</p><p>In the remainder of this course you will use a Java <code class="code">String</code> to describe the world in Conway's Game of Life. There are a multitude of sensible patterns you could use to describe the game board, but you should use the format described here so that your program is compatible with the examples in this Workbook and the automated tests. The format you need to support is
+</p><pre class="programlisting">NAME:AUTHOR:WIDTH:HEIGHT:STARTCOL:STARTROW:CELLS
+</pre><p>
+where <code class="code">NAME</code> is the name given to the board layout, <code class="code">AUTHOR</code> is the crsid or name of the author, and <code class="code">WIDTH</code> and <code class="code">HEIGHT</code> describe the board dimensions. Rather than specifying the state of all cells in the world, the format assumes that cells are dead unless explicitly specified otherwise. Consequently <code class="code">CELLS</code> is used to represent a <span class="emphasis"><em>subset</em></span> of the board which contains all the live cells. (Most cells in a typical world are dead so this optimisation is frequently useful.) The values of <code class="code">STARTCOL</code> and <code class="code">STARTROW</code> specify the location of the cells recorded in <code class="code">CELLS</code> in the world. The details of the format are perhaps best explained with the aid of the following example:
+</p><pre class="programlisting">Glider:Richard Guy (1970):20:20:1:1:010 001 111
+</pre><p>
+</p><p>The above example describes a world of 20 cells by 20 cells with a "Glider" in it. Gliders were discovered by Richard Guy in 1970. The contents of <code class="code">CELLS</code> is <code class="code">010 001 111</code> and records live cells with a one (<code class="code">1</code>) and dead cells with a zero (<code class="code">0</code>) in row order, using spaces to separate rows. Therefore, in the above example, the <code class="code">CELLS</code> part of the format states that cells (1,0), (2,1), (0,2), (1,2) and (2,2) are alive. The values of <code class="code">STARTCOL</code> and <code class="code">STARTROW</code> should be added to the values recorded in <code class="code">CELLS</code> and therefore the live cells in the world at generation zero are (2,1), (3,2), (1,3), (2,3) and (3,3); all other cells are dead.</p><div class="figure"><a name="fig:glider"></a><div class="figure-contents"><div class="mediaobject"><img src="figures/glider-20x20.png" alt="The Glider in a 20-by-20 world."></div></div><p class="title"><b>Figure 2. The Glider in a 20-by-20 world</b></p></div><br class="figure-break"><p>The layout of this world is shown in <a class="xref" href="#fig:glider" title="Figure 2. The Glider in a 20-by-20 world">Figure 2, “The Glider in a 20-by-20 world”</a>. Remember that this format assumes that cells are initialised as <span class="emphasis"><em>dead</em></span> unless they are explicitly marked as alive in the <code class="code">CELLS</code> section of the format string.</p><p>Your next challenge is to update your program ArrayLife so that it accepts strings in the new format. This updated version should be called StringArrayLife. StringArrayLife should accept the appropriately formatted string on the command line and use it to initialise the state of the world at generation zero. For example,
+</p><pre class="programlisting">crsid@machine:~&gt; java uk.ac.cam.your-crsid.tick3.StringArrayLife \
+"Glider:Richard Guy (1970):20:20:1:1:010 001 111"
+</pre><p>
+</p><p>It's essential to use the double quotes (<code class="code">"</code>) around the format string, otherwise the shell will interpret the format string as multiple arguments rather than as a single argument. In order to support the string format, you will need to devise a method of parsing and interpreting the values in the format string. Below are some code snippets which you may find helpful. You should use Sun's on-line documentation to work out how to use them.
+
+</p><div class="itemizedlist"><ul class="itemizedlist" type="disc" compact><li class="listitem"><p><code class="code">"A:B:C".split(":")</code></p></li><li class="listitem"><p><code class="code">"001".toCharArray()</code></p></li><li class="listitem"><p><code class="code">"010 001 111".split(" ")</code></p></li><li class="listitem"><p><code class="code">Integer.parseInt("1")</code></p></li></ul></div><p>
+
+You may like to check your understanding of the code snippets by writing a simple test program.
+</p><div class="sidebar" title="Creating StringArrayLife"><p class="title"><b>Creating StringArrayLife</b></p><div class="orderedlist"><ol class="orderedlist" start="5" type="1"><li class="listitem"><p>Copy the contents of your implementation of <code class="filename">ArrayLife.java</code> into a new file called <code class="filename">StringArrayLife.java</code> and update the name of the class accordingly.</p></li><li class="listitem"><p>Replace the contents of the <code class="code">main</code> function with the following code snippet and complete the sections marked <code class="code">TODO</code>.
+
+</p><pre class="programlisting">public static void main(String[] args) throws Exception {
+
+ String formatString = args[0];
+
+ //TODO: Determine the dimensions of the game board
+ int width = ...
+ int height = ...
+ boolean[][] world = new boolean[height][width];
+
+ //TODO: Using loops, update the appropriate cells of "world"
+ //      to "true"
+ // ...
+
+ play(world);
+}
+</pre><p>
+</p></li><li class="listitem"><p>Check your implementation of StringArrayLife works by testing it with the format string: <code class="code">"Glider:Richard Guy (1970):20:20:1:1:010 001 111"</code>. You should ensure that the initial state of the game is as shown in <a class="xref" href="#fig:glider" title="Figure 2. The Glider in a 20-by-20 world">Figure 2, “The Glider in a 20-by-20 world”</a>.</p></li></ol></div></div></div><div class="section" title="Writing your own Object"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:objects"></a>Writing your own Object</h2></div></div></div><p>In the final part of this workbook, you are going to redesign the StringArrayLife class to reduce the tight-coupling which currently exists in its design. Assume for a moment that you were working on your simulation of Conway's Game of Life with another developer. One developer might be working on parts of the program which applies the game rules to the two-dimensional world array, and the other developer on the subsystem used to load patterns and initialise the world.  With the current design both developers will need to inform each other whenever they make almost any change.</p><p>Good abstraction is essential in software development and in an object-oriented programming language objects provide the primary method of abstraction. In Java, a well designed class should allow a programmer to interact with it as a black box without worrying about how it works—this is beneficial for multiple people working on a project and also beneficial to a single programmer because it means they can write clearer programs which are more likely to function correctly. Therefore as the last task in this Workbook you will create a new class called <code class="code">Pattern</code> which will encapsulate all the state expressed by the format string described in the last section. </p><p>As you will see shortly, in this class you will prefix field names with the keyword <code class="code">private</code>. This means that the fields are only accessible by methods associated with the class, and not from elsewhere. This is a form of <span class="emphasis"><em>encapsulation</em></span> since it prevents external, uncontrolled modification of internal state. It is common to write "get" methods associated with some private fields which provide read-only access to the underlying state.</p><p>By creating a suitable directory structure and file of the correct name, create a class called <code class="code">Pattern</code> inside the package <code class="code">uk.ac.cam.your-crsid.tick3</code>. Use the following code as the basis for writing the class <code class="code">Pattern</code>:
+</p><pre class="programlisting">package uk.ac.cam.your-crsid.tick3;
+
+public class Pattern {
+
+ private String name;
+ private String author;
+ private int width;
+ private int height;
+ private int startCol;
+ private int startRow;
+ private String cells;
+ //TODO: write public "get" methods for EACH of the fields above;
+ //      for instance "getName" should be written as:
+ public String getName() {
+  return name;
+ }
+
+ public Pattern(String format) {
+  //TODO: initialise all fields of this class using contents of "format"
+  //      to determine the correct values.
+ }
+
+ public void initialise(boolean[][] world) {
+  //TODO: update the values in the 2D array representing the state of "world"
+  //      as expressed by the contents of the field "cells".
+ }
+} 
+</pre><p>
+</p><p>The behaviour of <code class="code">Pattern</code> when given an incorrectly formatted string is undefined for the purposes of this Tick, however you may like to choose some sensible defaults. The automatic tests associated with this Tick will always provide well formatted strings.</p><p>By creating a suitable directory structure and file of the correct name, create a class called <code class="code">PatternLife</code> inside the package <code class="code">uk.ac.cam.your-crsid.tick3</code>. Copy the contents of <code class="filename">StringArrayLife.java</code> into <code class="filename">PatternLife.java</code> and replace the <code class="code">main</code> function with:
+
+</p><pre class="programlisting">public static void main(String[] args) throws Exception {
+
+ Pattern p = new Pattern(args[0]);
+ boolean[][] world = new boolean[p.getHeight()][p.getWidth()];
+ p.initialise(world);
+ play(world);
+}
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="8" type="1"><li class="listitem"><p>Complete your implementation of <code class="code">Pattern</code>.</p></li><li class="listitem"><p>Complete your implmentation of <code class="code">PatternLife</code>.</p></li><li class="listitem"><p> Test your implementation of <code class="code">PatternLife</code> by providing appropriate configuration strings, for example:
+</p><pre class="programlisting">crsid@machine:~&gt; java uk.ac.cam.your-crsid.tick3.PatternLife \
+"Glider:Richard Guy (1970):20:20:1:1:010 001 111"
+</pre><p>
+</p></li></ol></div></div></div><div class="section" title="Java Tick 3"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="tick3"></a>Java Tick 3</h2></div></div></div><p>To submit your tick for this week, produce a jar file called <code class="filename">crsid-tick3.jar</code> with the following contents:
+</p><pre class="programlisting">META-INF/
+META-INF/MANIFEST.MF
+uk/ac/cam/your-crsid/tick3/FibonacciCache.class
+uk/ac/cam/your-crsid/tick3/FibonacciCache.java
+uk/ac/cam/your-crsid/tick3/ReferenceTest.java
+uk/ac/cam/your-crsid/tick3/ReferenceTest.class
+uk/ac/cam/your-crsid/tick3/ArrayLife.java
+uk/ac/cam/your-crsid/tick3/ArrayLife.class
+uk/ac/cam/your-crsid/tick3/StringArrayLife.java
+uk/ac/cam/your-crsid/tick3/StringArrayLife.class
+uk/ac/cam/your-crsid/tick3/Pattern.java
+uk/ac/cam/your-crsid/tick3/Pattern.class
+uk/ac/cam/your-crsid/tick3/PatternLife.java
+uk/ac/cam/your-crsid/tick3/PatternLife.class
+uk/ac/cam/your-crsid/tick3/PackedLong.java
+uk/ac/cam/your-crsid/tick3/PackedLong.class
+</pre><p>
+</p><p>The jar file should have its entry point set to <code class="code">uk.ac.cam.your-crsid.tick3.PatternLife</code> so that you can invoke PatternLife from the command line as follows:
+</p><pre class="programlisting">crsid@machine:~&gt; java -jar crsid-tick3.jar \
+"Glider:Richard Guy (1970):20:20:1:1:010 001 111"
+</pre><p>
+</p><p>Once you have produced a suitable jar file and tested that the code it contains works, you can submit it by emailing it as an attachment to <code class="code">ticks1a-java@cl.cam.ac.uk</code>.</p></div><div class="footnotes"><br><hr width="100" align="left"><div class="footnote"><p><sup>[<a name="ftn.id2714903" href="#id2714903" class="para">1</a>] </sup>Note: it is permissible to write <code class="code">int intArray[] = new int[5]</code> to create a new array of ints; this form is not recommended in this course as it mixes the type of a variable and its name.</p></div></div></div><p class="docfooter">Copyright 2008-2012 Alastair R. Beresford and Andrew C. Rice</p></body></html>

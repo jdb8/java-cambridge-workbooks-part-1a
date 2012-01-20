@@ -1,0 +1,363 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Workbook 5</title><link rel="stylesheet" href="style.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><p class="docheader"><b>Java 1A Practical Class</b></p><div class="article" title="Workbook 5"><div class="titlepage"><div><div><h2 class="title"><a name="id2566890"></a>Workbook 5</h2></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#sec:introduction">Introduction</a></span></dt><dt><span class="section"><a href="#sec:interfaces">Interfaces</a></span></dt><dt><span class="section"><a href="#sec:world1">An implementation of the World interface</a></span></dt><dd><dl><dt><span class="section"><a href="#subsec:stubs">Stub methods (draw and getPopulation)</a></span></dt><dt><span class="section"><a href="#subsec:print">The print method</a></span></dt><dt><span class="section"><a href="#subsec:nextgen">The nextGeneration methods</a></span></dt><dt><span class="section"><a href="#subsec:othermethods">Other methods</a></span></dt><dt><span class="section"><a href="#subsec:testing">Testing your program</a></span></dt></dl></dd><dt><span class="section"><a href="#sec:world2">Implementing the World interface again</a></span></dt><dt><span class="section"><a href="#sec:inheritence">Code inheritance</a></span></dt><dd><dl><dt><span class="section"><a href="#subsec:abstract">Keyword: abstract</a></span></dt><dt><span class="section"><a href="#subsec:access-control">Keywords: private, protected and public</a></span></dt><dt><span class="section"><a href="#subsec:extends">Keyword: extends</a></span></dt><dt><span class="section"><a href="#subsec:super">Keyword: super</a></span></dt><dt><span class="section"><a href="#subsec:this">Keyword: this</a></span></dt></dl></dd><dt><span class="section"><a href="#sec:benefits">Benefits from World interface</a></span></dt><dt><span class="section"><a href="#sec:tick5">Tick 5</a></span></dt></dl></div><div class="section" title="Introduction"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:introduction"></a>Introduction</h2></div></div></div><p>
+Last week you improved the error handling of your program by catching errors and throwing exceptions. You did this by defining your own exception, <code class="code">PatternFormatException</code>, which extended the class <code class="code">Exception</code>. This week you will explore what "extending" a class actually means by looking at inheritance in more detail.  You will also use this knowledge to refactor your implementation of LoaderLife you wrote last week to separate out the data structure used to record the state of the world into a separate object.
+</p><div class="important" title="Important" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Important</h3><p>Remember to check the course website regularly for announcements and errata:</p><p><a class="ulink" href="http://www.cl.cam.ac.uk/teaching/current/ProgJava" target="_top">http://www.cl.cam.ac.uk/teaching/current/ProgJava</a></p></div></div><div class="section" title="Interfaces"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:interfaces"></a>Interfaces</h2></div></div></div><p>An <em class="firstterm">interface</em> in Java defines a type, and specifies the methods which are <span class="emphasis"><em>required</em></span> in any implementation of the interface. For example, we could state the following methods are required in an implementation which is able to store, update and draw the state of a world in the Game of Life:
+
+</p><pre class="programlisting">package uk.ac.cam.acr31.life;
+
+public interface World {
+	public void setCell(int col, int row, boolean alive);
+	public boolean getCell(int col, int row);
+	public int getWidth();
+	public int getHeight();
+	public int getGeneration();
+	public int getPopulation();
+	public void print(Writer w);
+	public void draw(Graphics g,int width, int height);
+	public World nextGeneration(int log2StepSize);	
+}
+</pre><p>
+</p><p>Particular bits to note in this definition of the interface <code class="code">World</code> are the use of the keyword <code class="code">interface</code> in the definition (not <code class="code">class</code>), and the use of the semicolon (<code class="code">;</code>) instead of curly brackets (<code class="code">{</code> and <code class="code">}</code>) after the method names, indicating that the methods themselves are merely prototypes or descriptions and cannot contain actual code.</p><p>The specification of the interface <code class="code">World</code> states that any implementation of the interface is required to provide nine methods: <code class="code">setCell</code>, <code class="code">getCell</code>, <code class="code">getWidth</code>, <code class="code">getHeight</code>, and so on. Since the interface does not provide an implementation of the methods, the following is wrong and will result in a compile error:
+</p><pre class="programlisting">World w = new World(); //Wrong; will result in compile error
+</pre><p>
+</p><p>In order to implement an interface in Java you write a class which contains implementations of every method defined in the interface. In addition, you must use the keyword <code class="code">implements</code> to name the interface explicitly in the class definition. For example:
+</p><pre class="programlisting">package uk.ac.cam.your-crsid.tick5;
+
+import uk.ac.cam.acr31.life.World;
+import java.io.Writer;
+import java.awt.Graphics;
+import java.io.PrintWriter;
+
+public class TestArrayWorld implements World {
+
+ private int generation;
+ private int width;
+ private int height;
+ private boolean[][] cells;
+
+ public TestArrayWorld(int w, int h) {
+   width = w;
+   height = h;
+   // TODO: set generation equal to zero
+   // TODO: set cells to reference a new rectangular two-dimensional 
+   //       boolean array of size height by width  
+ }
+
+ protected TestArrayWorld(TestArrayWorld prev) {
+   width = prev.width;
+   height = prev.height;
+   // TODO: set generation equal to prev.generation+1
+   // TODO: set cells to reference a new rectangular two-dimensional 
+   //       boolean array of size height by width  
+ }
+
+ public boolean getCell(int col, int row) { /* TODO */ }
+ public void setCell(int col, int row, boolean alive) { /*TODO*/ }
+ public int getWidth()  { /*TODO*/ }
+ public int getHeight()  { /*TODO*/ }
+ public int getGeneration()  { /*TODO*/ }
+ public int getPopulation()  { return 0; }
+ public void print(Writer w)  { /*TODO*/ }
+ public void draw(Graphics g, int width, int height)  { /*Leave empty*/ }
+
+ private TestArrayWorld nextGeneration() {
+   //Construct a new TestArrayWorld object to hold the next generation:
+   TestArrayWorld world = new TestArrayWorld(this);
+   //TODO: Use for loops with "setCell" and "computeCell" to populate "world"
+   return world;
+ }
+
+ public World nextGeneration(int log2StepSize)  { 
+   TestArrayWorld world = this;
+   //TODO: repeat the statement in curly brackets 2^log2StepSize times
+   {
+    world = world.nextGeneration();
+   }
+   return world;
+ }
+   
+ //TODO: Add any other private methods which you find helpful      
+}
+</pre><p>
+</p><p>You will be instructed to complete this code later in the workbook.  For the moment just read through it and the explanation that follows.  Some of the keywords used (such as <code class="code">private</code> and <code class="code">protected</code>) might be unfamiliar to you.  These are explained later.</p><p>In Java, a class may implement multiple interfaces, in which case a list of comma-separated interfaces should appear after the keyword <code class="code">implements</code> in the class definition.</p><p>You can create variables of type <code class="code">World</code> which reference an instance of a class which implements the interface <code class="code">World</code>. For example, if you've implemented a class called <code class="code">MyWorldImpl</code> which implements the <code class="code">World</code> interface, then the following is correct
+</p><pre class="programlisting">MyWorldImpl a = new MyWorldImpl();
+System.out.println(a.getPopulation());
+World b = a;
+System.out.println(b.getPopulation());
+</pre><p>
+
+or more simply
+
+</p><pre class="programlisting">World b = new MyWorldImpl();
+System.out.println(b.getPopulation());
+</pre><p>
+</p><p>Any class which implements the interface <code class="code">World</code> can be assigned to a variable of type <code class="code">World</code>. This allows easy substitution of multiple different implementations, providing an extensible method of defining new ways of storing the state of the world in Conway's Game of Life. For example, later on in this Workbook, you will adapt your code from Tick 2 which used a <code class="code">long</code> integer to store the state of a world in a class called <code class="code">TestPackedWorld</code>. You will also adapt code from Tick 3 and Tick 4 which used a Java array to store the state of the world in a class called <code class="code">TestArrayWorld</code>. Since both these classes will implement the <code class="code">World</code> interface, you can substitute one implementation in place of another when drawing the state of the world to the terminal or (as we shall see later) a graphical display.</p><p>The interface <code class="code">World</code> is provided for you inside the package <code class="code">uk.ac.cam.acr31.life</code>, as shown in the definition written at the start of this Workbook. This interface, along with several other classes in this package, have been written for you. Using the <code class="code">World</code> interface defined in this package enables the interoperability described above—it also allows you to plug in implementations by other students if you wish. To introduce the name "<code class="code">World</code>" as short-hand for <code class="code">uk.ac.cam.acr31.life.World</code>, you need to write <code class="code">import uk.ac.cam.acr31.life.World;</code> at the top of your source files. This has been done for you in <code class="code">TestArrayWorld</code>.</p><p>To use the interface <code class="code">World</code> you also need to download and save the jar file containing the interface definition from <a class="ulink" href="http://www.cl.cam.ac.uk/teaching/current/ProgJava/world.jar" target="_top">http://www.cl.cam.ac.uk/teaching/current/ProgJava/world.jar</a>. To use the code available in this jar file, you will need to tell the java compiler (<code class="code">javac</code>) and the java runtime environment (<code class="code">java</code>) the location of the jar file. If you don't tell the compiler or the runtime where the jar file is, the tools won't be able to locate the definition of the <code class="code">World</code> interface and your own programs will not compile or run.</p><p>You can instruct the Java tools to look inside a jar file by providing an additional argument on the command line. For example, if you have saved <code class="filename">world.jar</code> to your home directory, then you can tell the Java compiler to look at, and possibly use, the contents of <code class="filename">world.jar</code> when compiling your own implementation of <code class="code">TestArrayWorld</code> as follows:
+</p><pre class="programlisting">crsid@machine:~&gt; javac -cp /home/crsid/world.jar:. \
+uk/ac/cam/your-crsid/tick5/TestArrayWorld.java
+</pre><p>
+
+The option <code class="code">-cp</code> stands for <em class="firstterm">class path</em>. The class path in Java is, by default, the set of directories and jar files which are searched for class definitions. By default, the standard library and current working directory are on the class path but, as you've seen above, you may have to manually add to the class path if you wish to work with libraries provided by third parties.
+</p><p>If you want to include multiple directories and jar files on the class path, then you can use the colon (<code class="code">:</code>) operator to separate them. In the example above, the classes within <code class="code">world.jar</code>, as well as the class files located in the current working directory (represented by "<code class="code">.</code>") are put on the class path. (Whilst the current working directory is on the class path by default, it is removed when using the <code class="code">-cp</code> option, so you will often need to include it again.)
+</p><p>The <code class="code">-jar</code> option you have used in previous weeks is actually just a convenient way of adding the jar file to the class path, and then executing the class specified as the entry point. For example, last week you built a jar file called <code class="filename">crsid-tick4.jar</code> with the entry point set to <code class="code">uk.ac.cam.your-crsid.tick4.LoaderLife</code>. You can run the main method in <code class="code">LoaderLife</code> by executing:
+</p><pre class="programlisting">crsid@machine:~&gt; java -jar crsid-tick4.jar
+</pre><p>
+which is the same as writing
+</p><pre class="programlisting">crsid@machine:~&gt; java -cp crsid-tick4.jar uk.ac.cam.your-crsid.tick4.LoaderLife
+</pre><p>
+</p></div><div class="section" title="An implementation of the World interface"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:world1"></a>An implementation of the World interface</h2></div></div></div><p>Create a new package called <code class="code">uk.ac.cam.your-crsid.tick5</code> and copy the contents of <code class="code">TestArrayWorld</code> as shown in the previous section into a file with a suitable name inside this package. Copy across your implementation of <code class="code">LoaderLife</code> from last week, renaming the class <code class="code">RefactorLife</code>. Finally, copy across your implementations of <code class="code">Pattern</code>, <code class="code">PatternLoader</code> and <code class="code">PatternFormatException</code>. Remember to update the package statements at the top of your source files appropriately.</p><div class="sidebar"><p class="title"><b></b></p><p>Some further hints on how to complete these questions appear in the Workbook immediately after this question box.</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Rewrite the <code class="code">initialise</code> method of <code class="code">Pattern</code> so that it takes a single argument of type <code class="code">World</code>. Hint: you will need to make use of <code class="code">setCell</code> defined in the <code class="code">World</code> interface to initialise the pattern correctly.</p></li><li class="listitem"><p>Complete the sections marked <code class="code">TODO</code> in <code class="code">TestArrayWorld</code> by adapting the code currently in <code class="code">RefactorLife</code> as a template. For example, you might find it helpful to look at the method <code class="code">setCell</code> in <code class="code">RefactorLife</code> when implementing <code class="code">setCell</code> in <code class="code">TestArrayWorld</code>.</p></li><li class="listitem"><p>Adapt your implementation of the <code class="code">main</code> method in <code class="code">RefactorLife</code> to use <code class="code">TestArrayWorld</code> to store the current state of the world.</p></li><li class="listitem"><p>If you have done the above correctly you will find that all but the <code class="code">main</code> and <code class="code">play</code> methods in <code class="code">RefactorLife</code> are not used, since you should have copied or adapted all the other methods into <code class="code">TestArrayWorld</code>. Delete all the unused methods from <code class="code">RefactorLife</code>.</p></li><li class="listitem"><p>Test your refactored program still works by using the procedure provided in the section labelled "Testing your program" below.</p></li></ol></div></div><div class="section" title="Stub methods (draw and getPopulation)"><div class="titlepage"><div><div><h3 class="title"><a name="subsec:stubs"></a>Stub methods (draw and getPopulation)</h3></div></div></div><p>When implementing <code class="code">TestArrayWorld</code> you do not have to implement the <code class="code">draw</code> method, so as the comment suggests, you may leave it blank.  Similarly you will see that <code class="code">getPopulation</code> method returns 0 rather than the correct answer.  These are commonly known as method stubs.  The idea is to put something simple in so that the program will compile and unrelated functionality will work.  Once the program compiles the programmer will return to the stubs and incrementally replace them with working code.</p></div><div class="section" title="The print method"><div class="titlepage"><div><div><h3 class="title"><a name="subsec:print"></a>The print method</h3></div></div></div><p>The <code class="code">print</code> method should take a single argument of type <code class="code">Writer</code> rather than simply printing using <code class="code">System.out.print</code> and <code class="code">System.out.println</code>. Here is a skeleton which you can use to complete the new version of <code class="code">print</code>:
+</p><pre class="programlisting">public void print(Writer w) {
+ PrintWriter pw = new PrintWriter(w);
+ // See the Java documentation for PrintWriter
+ //
+ // use pw.print("something") to write to the writer
+ // use pw.println("something") to write a newline
+ //
+ // you must always call pw.flush() at the end of this method
+ // to force the PrintWriter to write to the terminal (if you
+ // do not, then data may be buffered inside PrintWriter).
+}
+</pre><p>
+</p><p>You can use the Java <code class="code">OutputStreamWriter</code> class to create an instance of type <code class="code">Writer</code> which outputs information to the terminal. For example, the following snippet of code should print the contents of a variable <code class="code">world</code> of type <code class="code">World</code> to the terminal:
+</p><pre class="programlisting">Writer w = new OutputStreamWriter(System.out);
+world.print(w);
+</pre><p>
+</p><p>Remember to include appropriate import statements at the top of your source file. For example, you will need to write:
+</p><pre class="programlisting">import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
+</pre><p>
+to successfully use the <code class="code">PrintWriter</code> and <code class="code">OutputStreamWriter</code>.
+</p></div><div class="section" title="The nextGeneration methods"><div class="titlepage"><div><div><h3 class="title"><a name="subsec:nextgen"></a>The nextGeneration methods</h3></div></div></div><p>The <code class="code">World</code> interface specifies a <code class="code">nextGeneration</code> method which takes a single argument called <code class="code">log2StepSize</code>.  This argument states the number of generations to iterate through before returning the state of the new world. For example, if <code class="code">log2StepSize</code> has the value 0, then, since 2<sup>0</sup> = 1, executing the method <code class="code">nextGeneration</code> with the value 0 should update the state of the world by one generation. If <code class="code">log2StepSize</code> has the value 2, then since 2<sup>2</sup> = 4, executing the method <code class="code">nextGeneration</code> with the value 2 should update the state of the world by four generations. You should use a <code class="code">for</code> loop inside the method <code class="code">nextGeneration</code> to update the state of the world the correct number of times. You might find it helpful to recall that <code class="code">1 &lt;&lt; n</code> is equivalent to 2<sup>n</sup>.</p><p>A good way to implement the <code class="code">nextGeneration</code> method described above is to first complete the private <code class="code">nextGeneration</code> method (the one which takes no arguments) which should perform a single timestep forward in the Game of Life. Then complete the original <code class="code">nextGeneration</code> method required by the interface by repeatedly calling your private <code class="code">nextGeneration</code> method. You will need to use the methods <code class="code">computeCell</code> and <code class="code">countNeighbours</code> which are discussed next.</p></div><div class="section" title="Other methods"><div class="titlepage"><div><div><h3 class="title"><a name="subsec:othermethods"></a>Other methods</h3></div></div></div><p>In previous weeks you wrote several helpful methods inside the body of what is now called <code class="code">RefactorLife</code>. These methods include <code class="code">countNeighbours</code> and <code class="code">computeCell</code>. You should move these methods from <code class="code">RefactorLife</code> to <code class="code">TestArrayWorld</code>; they should  become non-static, private methods and operate directly on the <code class="code">cells</code> field. For example, the method <code class="code">countNeighbours</code> should have the following prototype inside <code class="code">TestArrayWorld</code>:
+</p><pre class="programlisting">private int countNeighbours(int col, int row)
+</pre><p>
+</p></div><div class="section" title="Testing your program"><div class="titlepage"><div><div><h3 class="title"><a name="subsec:testing"></a>Testing your program</h3></div></div></div><p>When you've finished refactoring your code, your implementation of <code class="code">RefactorLife</code> should behave just as <code class="code">LoaderLife</code> did last week. For example, the following should work:
+</p><pre class="programlisting">crsid@machine:~&gt;java -cp /home/crsid/world.jar:. \
+uk/ac/cam/your-crsid/tick5/RefactorLife \
+http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt 0
+-
+________
+___#____
+_#_#____
+__##____
+________
+________
+________
+________
+</pre><p>
+Pressing <span class="keycap"><strong>Enter</strong></span> should show successive generations of the Game of Life. Typing <span class="keycap"><strong>q</strong></span> followed by <span class="keycap"><strong>Enter</strong></span> should quit the application as before.
+</p></div></div><div class="section" title="Implementing the World interface again"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:world2"></a>Implementing the World interface again</h2></div></div></div><p>In the last section you produced an implementation of the interface <code class="code">World</code> which used arrays to store the state of the world. In this section you will write a second class called <code class="code">TestPackedWorld</code> to use a <code class="code">long</code> integer to store the state of the world, just as you did in Tick 2.</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="6" type="1"><li class="listitem"><p>Create a new class called <code class="code">TestPackedWorld</code> by copying across the code you wrote for <code class="code">TestArrayWorld</code> into <code class="filename">TestPackedWorld.java</code> and updating the name of the class appropriately.</p></li><li class="listitem"><p>Update the type of <code class="code">cells</code> from <code class="code">boolean[][]</code> to <code class="code">long</code>.</p></li><li class="listitem"><p>Update the names of the constructors from <code class="code">TestArrayWorld</code> to <code class="code">TestPackedWorld</code>. Replace the constructor which takes a width and height with a constructor which takes no arguments, and modify the body of the constructors so the values of the fields <code class="code">width</code> and <code class="code">height</code> are always set to eight; also make sure the field <code class="code">cells</code> is initialised to the value zero. The constructor which takes an argument of type <code class="code">TestArrayWorld</code> should take a single argument of type <code class="code">TestPackedWorld</code> instead.</p></li><li class="listitem"><p>Update the body of the methods <code class="code">getCell</code> and and <code class="code">setCell</code> so that they get or set the appropriate bits in <code class="code">cells</code>. You should look at contents of the file <code class="filename">TinyLife.java</code> which you wrote for Tick 2 for help, and copy across your implementation of <code class="filename">PackedLong.java</code> to get and set bits in a <code class="code">long</code> integer.</p></li><li class="listitem"><p> Update any other methods in <code class="code">TestPackedWorld</code> which relied on <code class="code">cells</code> being of type <code class="code">boolean[][]</code>.</p></li><li class="listitem"><p> Update all uses of <code class="code">TestArrayWorld</code> to <code class="code">TestPackedWorld</code> in the two methods called <code class="code">nextGeneration</code>.</p></li><li class="listitem"><p> Test your implementation of <code class="code">TestPackedWorld</code> by replacing all uses of <code class="code">TestArrayWorld</code> with <code class="code">TestPackedWorld</code> in <code class="code">RefactorLife</code>. Make sure that <code class="code">RefactorLife</code> still executes correctly for worlds of size 8-by-8.</p></li></ol></div></div><p>In order to use your latest implementation of <code class="code">RefactorLife</code> you simply replaced all instances of <code class="code">TestArrayWorld</code> with <code class="code">TestPackedWorld</code>, but this now precludes the use of Java arrays to store the state of the world. A better solution is to accept an argument on the command line which instructs the program to use a particular implementation—arrays or <code class="code">long</code>—as the underlying storage mechanism.</p><p>The approach you should use is to modify <code class="code">RefactorLife</code> to accept an option on the command line to specify the underlying storage architecture used. If the user types "<code class="code">--array</code>" as the first argument, then the storage architecture used should be a Java array, using <code class="code">TestArrayWorld</code>; if the user types "<code class="code">--long</code>" as the first argument then the storage used to record the state of the world should be <code class="code">TestPackedWorld</code>. If no switch is specified, then your implementation of <code class="code">RefactorLife</code> should default to using Java arrays to store the state of the world. Here is an example invocation which requests the use of Java arrays using the "<code class="code">--array</code>" switch:
+</p><pre class="programlisting">crsid@machine:~&gt;java -cp /home/crsid/world.jar:. \
+uk/ac/cam/your-crsid/tick5/RefactorLife --array \
+http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt 0
+</pre><p>
+</p><p>Here is an example invocation of which requests the use of a <code class="code">long</code> integer to store the state of the world:
+</p><pre class="programlisting">crsid@machine:~&gt;java -cp /home/crsid/world.jar:. \
+uk/ac/cam/your-crsid/tick5/RefactorLife --long \
+http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt 0
+</pre><p>
+</p><p>Here is an example invocation which specifies no storage type (your code should default to using Java arrays):
+</p><pre class="programlisting">crsid@machine:~&gt;java -cp /home/crsid/world.jar:. \
+uk/ac/cam/your-crsid/tick5/RefactorLife \
+http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt 0
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><p>Some further hints on how to complete this question appear in the Workbook immediately after this question box.</p><div class="orderedlist"><ol class="orderedlist" start="13" type="1"><li class="listitem"><p> Extend your implementation of <code class="code">RefactorLife</code> to accept an optional "switch" on the command line to enable the state of the world to be stored in an array or in a <code class="code">long</code> integer. You should print a descriptive error message if an optional argument of an unknown type is provided.</p></li></ol></div></div><p>You may have heard in lectures that you cannot compare strings for equality as follows:
+</p><pre class="programlisting">String first = new String("a");
+String second = new String("a");
+if (first == second) { //does not perform String equality
+	System.out.println("This is not printed");
+}
+else {
+	System.out.println("This is printed!");
+}
+</pre><p>
+this is because the equality operator for variables which reference Java objects (e.g. <code class="code">first</code> and <code class="code">second</code> above) returns <code class="code">true</code> only if the two references point to the same underlying object. In the above code snippet, <code class="code">first</code> and <code class="code">second</code> are variables which reference two <span class="emphasis"><em>separate</em></span> instances of a Java String which contain the same character sequence.
+</p><p>To check whether the <span class="emphasis"><em>contents</em></span> of two String objects contain the same characters you should use the <code class="code">equals</code> method of the String object:
+</p><pre class="programlisting">if (first.equals(second)) {
+	System.out.println("This is printed");
+}
+else {
+	System.out.println("This is not printed!");
+}
+</pre><p>
+All variables which reference Java objects contain an <code class="code">equals</code> method which you should use to compare two references for equality.
+</p><p>When you write your improved implementation of <code class="code">RefactorLife</code>, you should declare a variable of type <code class="code">World</code> to reference an instance of either <code class="code">TestArrayWorld</code> or <code class="code">TestPackedWorld</code> and use if-else statements to update the reference to point to the correct instance. Here is a skeleton piece of code:
+</p><pre class="programlisting">public static main(String[] args) {
+ 
+ String worldType = args.length == 3 ? args[0] : "--array"; 
+ 
+ //TODO: initialise other variables here and interpret format string
+ //      which defines the size and state of the world
+ 
+ World world = null;
+ if (worldType.equals("--array")) {
+  world = new TestArrayWorld(/* TODO */);
+ } else if (worldType.equals("--long") {
+  world = new TestPackedWorld(/* TODO */); 
+ } else {
+   //TODO: print a descriptive error message
+   return; 
+ }
+
+ //TODO: use the "world" variable to display the state of the world
+ //      on the terminal using the "print" method
+}
+</pre><p>
+</p></div><div class="section" title="Code inheritance"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:inheritence"></a>Code inheritance</h2></div></div></div><p>Your implementation of <code class="code">TestArrayWorld</code> and <code class="code">TestPackedWorld</code> share substantial amounts of identical code. This is bad from a software engineering
+point of view because you have implemented the same bugs twice, and you'll have to fix them in two places. When you need to add new features you will have to add them in two places too. If you add more methods of storing the state of the world by creating new classes which implement <code class="code">World</code>, you'll then have three or more places to update with new features (or bug fixes)!</p><p>One solution to this is to use <span class="emphasis"><em>code inheritance</em></span> to collect together the shared code in one place. Unlike interfaces, inheritance allows the programmer to share code between classes. Shared pieces of code are placed in the <em class="firstterm">parent</em> class, and this basic implementation is then <em class="firstterm">extended</em> by a <em class="firstterm">child</em> class. The child classes then automatically inherit any methods or fields provided in the parent class.</p><p>A parent class might not provide an implementation of all the methods which are expected to appear in the child classes. In which case, the parent class is an <em class="firstterm">abstract</em> class; since not all the methods have an implementation, it is not possible to create an instance of an abstract class. Next is an example abstract class which collects together all the shared code which is found in your implementation of <code class="code">TestArrayWorld</code> and <code class="code">TestPackedWorld</code>. A full explanation of this code is given in subsequent subsections of this Workbook.
+</p><pre class="programlisting">package uk.ac.cam.your-crsid.tick5;
+
+import java.awt.Color;
+//TODO: insert other appropriate "import" statements here
+
+public abstract class WorldImpl implements World {
+
+ private int width;
+ private int height;
+ private int generation;
+
+ protected WorldImpl(int width, int height) {
+  this.width = width;
+  this.height = height;
+  this.generation = 0;
+ }
+  
+ protected WorldImpl(WorldImpl prev) {
+  this.width = prev.width;
+  this.height = prev.height;
+  this.generation = prev.generation + 1;
+ } 
+
+ public int getWidth() { return this.width; }
+
+ public int getHeight() { return this.height; }
+  
+ public int getGeneration() { return this.generation; }
+ 
+ public int getPopulation() { return 0; }
+
+ protected String getCellAsString(int col,int row) {
+  return getCell(col,row) ? "#" : "_";
+ }
+
+ protected Color getCellAsColour(int col,int row) {
+  return getCell(col,row) ? Color.BLACK : Color.WHITE;
+ }  
+ public void draw(Graphics g,int width, int height) {
+  int worldWidth = getWidth();
+  int worldHeight = getHeight();
+  
+  double colScale = (double)width/(double)worldWidth;
+  double rowScale = (double)height/(double)worldHeight;
+  
+  for(int col=0; col&lt;worldWidth; ++col) {
+   for(int row=0; row&lt;worldHeight; ++row) {
+    int colPos = (int)(col*colScale);
+    int rowPos = (int)(row*rowScale);
+    int nextCol = (int)((col+1)*colScale);
+    int nextRow = (int)((row+1)*rowScale);
+
+    if (g.hitClip(colPos,rowPos,nextCol-colPos,nextRow-rowPos)) {
+     g.setColor(getCellAsColour(col, row));
+     g.fillRect(colPos,rowPos,nextCol-colPos,nextRow-rowPos);
+    }
+   } 
+  }  
+ }
+</pre><p>
+</p><pre class="programlisting"> //TODO: Complete here in parent
+ public World nextGeneration(int log2StepSize) {
+  //Remember to call nextGeneration 2^log2StepSize times
+ }
+
+ //TODO: Complete here in parent
+ public void print(Writer w) {
+  //Use getCellAsString to get text representation of the cell
+ }
+ 
+ //TODO: Complete here in parent
+ protected int countNeighbours(int col, int row) {
+  //Compute the number of live neighbours
+ }
+
+ //TODO: Complete here in parent
+ protected boolean computeCell(int col, int row) {
+  //Compute whether this cell is alive or dead in the next generation
+  //using "countNeighbours"
+ }
+
+ // Will be implemented by child class. Return true if cell (col,row) is alive.
+ public abstract boolean getCell(int col,int row);
+
+ // Will be implemented by child class. Set a cell to be live or dead.
+ public abstract void setCell(int col, int row, boolean alive);
+
+ // Will be implemented by child class. Step forward one generation.
+ protected abstract WorldImpl nextGeneration();
+}
+</pre><p>
+</p><p>Note that the class <code class="code">WorldImpl</code> has no method of storing the state of the world. This task is left to child classes which extend <code class="code">WorldImpl</code>.</p><div class="section" title="Keyword: abstract"><div class="titlepage"><div><div><h3 class="title"><a name="subsec:abstract"></a>Keyword: abstract</h3></div></div></div><p>A few new keywords have been introduced in this class definition. The keyword <code class="code">abstract</code> prefixes both the keyword <code class="code">class</code> and several methods. Just as you saw earlier with interfaces, abstract methods contain no body and instead are terminated with a semi-colon (<code class="code">;</code>).</p></div><div class="section" title="Keywords: private, protected and public"><div class="titlepage"><div><div><h3 class="title"><a name="subsec:access-control"></a>Keywords: private, protected and public</h3></div></div></div><p>Methods and fields are prefixed with one of three <em class="firstterm">access modifiers</em>. Fields or methods which are marked <code class="code">private</code> cannot be accessed by any other class (not even children); those marked <code class="code">protected</code> can only be accessed within the class, by any child class (or any subsequent child of the child) or by any class in the same package; those marked with <code class="code">public</code> are accessible from any class. Finally, if a method or field does not have any access modifier, it is accessible by any class in the same package. You should use access modifiers to minimise access to fields and methods as much as possible in order to control complexity and therefore reduce the chance for unintentional interdependence between classes; this should help reduce bugs and make your code more legible to others (and yourself when you return to read it after a few months).</p></div><div class="section" title="Keyword: extends"><div class="titlepage"><div><div><h3 class="title"><a name="subsec:extends"></a>Keyword: extends</h3></div></div></div><p>To create a subclass of <code class="code">WorldImpl</code> you use the <code class="code">extends</code> keyword. For example, to create a new child class of <code class="code">WorldImpl</code> called <code class="code">ArrayWorld</code> you should write the following:
+</p><pre class="programlisting">public class ArrayWorld extends WorldImpl {
+...
+}
+</pre><p>
+</p></div><div class="section" title="Keyword: super"><div class="titlepage"><div><div><h3 class="title"><a name="subsec:super"></a>Keyword: super</h3></div></div></div><p>Unlike interfaces, a class can only inherit from a <span class="emphasis"><em>single</em></span> parent in Java. All the methods of the parent class are inherited by the child <span class="emphasis"><em>with the exception of the constructors</em></span>. If a parent class has no default constructor (i.e. it has no constructor which takes zero arguments) then the child class <span class="emphasis"><em>must</em></span> provide a constructor; in addition the constructor provided in the child class <span class="emphasis"><em>must</em></span> call the constructor of the parent class. For example, the class <code class="code">WorldImpl</code> does not have a default constructor. Consequently <code class="code">ArrayWorld</code> as declared above must provide at least one constructor and inside it call a constructor for the parent class. This can be done as follows:
+</p><pre class="programlisting">public class ArrayWorld extends WorldImpl {
+
+ public ArrayWorld(int width, int height) {
+  super(width,height);
+  //possibly other constructor stuff here
+ }
+ ...
+}
+</pre><p>
+In this example the special method <code class="code">super</code> is used to call a constructor in the parent class, in this case the constructor in <code class="code">WorldImpl</code> which takes two <code class="code">int</code> arguments. The call to <code class="code">super</code> must be the first statement found inside the body of the constructor. If a child has a method body provided for every abstract method found in a parent class, then the child class is no longer an abstract class, and concrete instances of it can be created. For example:
+</p><pre class="programlisting">World world = new ArrayWorld(8,8);
+</pre><p>
+</p><p>is possible if <code class="code">ArrayWorld</code> provides implementations for the three abstract methods found in <code class="code">WorldImpl</code>.</p></div><div class="section" title="Keyword: this"><div class="titlepage"><div><div><h3 class="title"><a name="subsec:this"></a>Keyword: this</h3></div></div></div><p>The existence of a concrete class such as <code class="code">ArrayWorld</code> allows the last important keyword introduced in the class <code class="code">WorldImpl</code> to be discussed. The keyword is <code class="code">this</code>, which is a read-only variable which references the current object instance on which the method has been called. For example, in the code snippet above, the variable <code class="code">world</code> references a new instance of <code class="code">ArrayWorld</code>. Inside the body of the call to the constructor of the parent class (<code class="code">WorldImpl</code>), <code class="code">this</code> references the new instance of <code class="code">ArrayWorld</code> under construction. Therefore <code class="code">this.width</code> references the <span class="emphasis"><em>field</em></span> called <code class="code">width</code> found in the class definition of <code class="code">WorldImpl</code>, whereas <code class="code">width</code> references the local variable of the same name which is the first argument to the constructor.
+</p><p>The keyword <code class="code">this</code> is optional in many cases.  If you refer back to the constructor for <code class="code">TestArrayWorld</code> you will see that it has been omitted.  This is because the arguments of the constructor are called <code class="code">w</code> and <code class="code">h</code> and so the member variable <code class="code">width</code> can be referred to without needing to write <code class="code">this.width</code>.  If the argument of a method has the same name as a member variable then the argument masks the member variable.</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="14" type="1"><li class="listitem"><p> Complete the class <code class="code">WorldImpl</code> by finishing the non-abstract methods marked <code class="code">TODO</code> by cut 'n' pasting code from methods of the same name found in <code class="code">TestArrayWorld</code> and editing appropriately. Place appropriate <code class="code">import</code> statements at the top of the source file and check you have done so by compiling <code class="code">WorldImpl</code>.</p></li><li class="listitem"><p> Create a new class called <code class="code">ArrayWorld</code> which extends <code class="code">WorldImpl</code>. The class should provide a suitable implementation for each abstract method declared in the parent class so that <code class="code">ArrayWorld</code> may be instantiated and is functionally identical to <code class="code">TestArrayWorld</code>. You will need to provide a private field of type <code class="code">boolean[][]</code>  called <code class="code">cells</code> to store the state of the world. In addition you should provide two constructors: one should take two <code class="code">int</code> arguments specifying the width and height of the world, and one which takes a reference to an existing <code class="code">ArrayWorld</code>; both constructors should call a constructor of the parent class using the special call <code class="code">super</code> and then initialise <code class="code">cells</code> to reference a suitable instance of a two dimensional boolean array.</p></li><li class="listitem"><p> Create a new class called <code class="code">PackedWorld</code> which extends <code class="code">WorldImpl</code>. The class should provide a suitable implementation for each abstract method declared in the parent class so that <code class="code">PackedWorld</code> may be instantiated and is functionally identical to <code class="code">TestPackedWorld</code>. You will need to provide a private field of type <code class="code">long</code>  called <code class="code">cells</code> to store the state of the world. In addition you should provide two constructors: one should take no arguments, and one which takes a reference to an existing <code class="code">PackedWorld</code>; both constructors should call a constructor of the parent class using the special call <code class="code">super</code> and then initialise <code class="code">cells</code> to the value zero.</p></li><li class="listitem"><p> Update <code class="code">RefactorLife</code> to use your implementations of <code class="code">ArrayWorld</code> and <code class="code">PackedWorld</code> instead of <code class="code">TestArrayWorld</code> and <code class="code">TestPackedWorld</code>. Test your latest version of <code class="code">RefactorLife</code> by supplying a variety of format strings which describe particular starting worlds in the Game of Life.</p></li></ol></div></div></div></div><div class="section" title="Benefits from World interface"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:benefits"></a>Benefits from World interface</h2></div></div></div><p>Your implementation of <code class="code">ArrayWorld</code> and <code class="code">PackedWorld</code> both extend the abstract class <code class="code">WorldImpl</code> which in turn implements the interface <code class="code">World</code>. Therefore both <code class="code">ArrayWorld</code> and <code class="code">PackedWorld</code> are of type <code class="code">World</code>. Consequently, you can use the graphics display class inside <code class="filename">world.jar</code> which you downloaded at the start of this workbook. To use the graphical display component, you first need to import the class by typing "<code class="code">import uk.ac.cam.acr31.life.WorldViewer;</code>" at the top of <code class="code">RefactorLife</code>. You can create a new instance of the <code class="code">WorldViewer</code> class as follows:
+</p><pre class="programlisting">WorldViewer viewer = new WorldViewer();
+</pre><p>
+</p><p>To use an instance of <code class="code">WorldViewer</code> to display a <code class="code">World</code> you can use the <code class="code">show</code> method. For example, if you have a variable called <code class="code">world</code> of type <code class="code">World</code> then you can type:
+</p><pre class="programlisting">viewer.show(world);
+</pre><p>
+
+This method can be called repeatedly to update the screen when a new generation is computed. You should destroy the <code class="code">WorldViewer</code> instance after you have finished by calling <code class="code">viewer.close()</code>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="18" type="1"><li class="listitem"><p> Update the <code class="code">play</code> method (or if you've integrated it, the <code class="code">main</code> method) of your implementation of <code class="code">RefactorLife</code> to use the <code class="code">WorldViewer</code> class to draw a graphical representation of the world <span class="emphasis"><em>in addition to printing the world to the terminal</em></span>.</p></li></ol></div><p>Note: you will still need to type <span class="keycap"><strong>q</strong></span> followed by <span class="keycap"><strong>Enter</strong></span> into the terminal window to quit the application. This is acceptable this week; you will revisit this next week when you explore event handling in graphical user interfaces.</p><p>If you completed Tick 3*, then you might like to replace the draw method in <code class="code">WorldImpl</code> with the draw method you wrote.</p></div><p>Another representation of the Game of Life is to use an <code class="code">int[][]</code> to store the number of generations since a cell was last alive.  An implementation of this can be downloaded from <a class="ulink" href="http://www.cl.cam.ac.uk/teaching/current/ProgJava/AgingWorld.java" target="_top">http://www.cl.cam.ac.uk/teaching/current/ProgJava/AgingWorld.java</a>. Place a copy of this file in the package <code class="code">uk.ac.cam.your-crsid.tick5</code> and update the package declaration in the file.</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="19" type="1"><li class="listitem"><p> Modify your RefactorLife program to accept the argument <code class="code">--aging</code> which 
+should use the implementation of <code class="code">AgingWorld</code> rather than <code class="code">ArrayWorld</code> or <code class="code">PackedWorld</code> to store the state of the world.</p></li></ol></div><p>You should test your program before you continue with this workbook. The use of the <code class="code">--aging</code> option switch should produce the same output as using <code class="code">--array</code>.</p></div><p>Keeping a history of the number of generations since each cell was last alive is not currently exploited in the graphical interface. It would be nice to use colour to display the number of generations since the cell was last alive. To do so, you should add the following method to your <code class="code">AgingWorld</code> class as follows:
+</p><pre class="programlisting">protected Color getCellAsColour(int col, int row) {
+ int age = getCellAge(col, row);
+ final int[] colors = new int[] 
+ {00000000,16711680,16717568,16724224,16731136,16738048,16744960,
+  16751616,16758528,16765440,16772096,16776982,16777062,16777141};
+ if (age &gt;= colors.length) { return Color.WHITE;}
+  return new Color(colors[age]);
+}
+</pre><p>
+</p><p>The method <code class="code">getCellAsColour</code> <span class="emphasis"><em>overrides</em></span> the default implementation of <code class="code">getCellAsColour</code> found in <code class="code">WorldImpl</code>. When the <code class="code">draw</code> method is called on <code class="code">AgingWorld</code>, the <code class="code">draw</code> method provided by <code class="code">WorldImpl</code> will run as normal.  However, the <code class="code">draw</code> method calls <code class="code">getCellAsColour</code> and the new implementation will be used instead of the default one in <code class="code">WorldImpl</code>. This is depicted graphically in <a class="xref" href="#fig:override" title="Figure 1. AgingWorld overrides the getCellAsColour method">Figure 1, “AgingWorld overrides the <code class="code">getCellAsColour</code> method”</a>.</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="20" type="1"><li class="listitem"><p> Modify your implementation of <code class="code">AgingWorld</code> to include the method <code class="code">getCellAsColour</code>. Run your implementation of <code class="code">RefactorLife</code> with the switch "<code class="code">--aging</code>". You should now see a graphical window with a colourful rendering of Conway's Game of Life.</p></li></ol></div></div><div class="figure"><a name="fig:override"></a><div class="figure-contents"><div class="mediaobject"><img src="figures/overrides.png" alt="AgingWorld overrides the getCellAsColour method"></div></div><p class="title"><b>Figure 1. AgingWorld overrides the <code class="code">getCellAsColour</code> method</b></p></div><br class="figure-break"></div><div class="section" title="Tick 5"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:tick5"></a>Tick 5</h2></div></div></div><p>To complete your tick you need to prepare a jar file with the contents of all the classes you have written in this workbook and email it to <code class="code">ticks1a-java@cl.cam.ac.uk</code>. Your jar file should contain:
+</p><pre class="programlisting">uk/ac/cam/your-crsid/tick5/RefactorLife.java
+uk/ac/cam/your-crsid/tick5/RefactorLife.class
+uk/ac/cam/your-crsid/tick5/WorldImpl.java
+uk/ac/cam/your-crsid/tick5/WorldImpl.class
+uk/ac/cam/your-crsid/tick5/TestArrayWorld.java
+uk/ac/cam/your-crsid/tick5/TestArrayWorld.class
+uk/ac/cam/your-crsid/tick5/TestPackedWorld.java
+uk/ac/cam/your-crsid/tick5/TestPackedWorld.class
+uk/ac/cam/your-crsid/tick5/ArrayWorld.java
+uk/ac/cam/your-crsid/tick5/ArrayWorld.class
+uk/ac/cam/your-crsid/tick5/PackedWorld.java
+uk/ac/cam/your-crsid/tick5/PackedWorld.class
+uk/ac/cam/your-crsid/tick5/AgingWorld.java
+uk/ac/cam/your-crsid/tick5/AgingWorld.class
+uk/ac/cam/your-crsid/tick5/Pattern.java
+uk/ac/cam/your-crsid/tick5/Pattern.class
+uk/ac/cam/your-crsid/tick5/PackedLong.java
+uk/ac/cam/your-crsid/tick5/PackedLong.class
+uk/ac/cam/your-crsid/tick5/PatternLoader.java
+uk/ac/cam/your-crsid/tick5/PatternLoader.class
+uk/ac/cam/your-crsid/tick5/PatternFormatException.java
+uk/ac/cam/your-crsid/tick5/PatternFormatException.class
+</pre><p>
+</p><p>You should be able to run your program in one of three ways:
+</p><div class="itemizedlist"><ul class="itemizedlist" type="disc" compact><li class="listitem"><p><code class="code">java -cp world.jar:crsid-tick5.jar \<br>
+uk.ac.cam.your-crsid.tick5.RefactorLife [url/file]</code></p></li><li class="listitem"><p><code class="code">java -cp world.jar:crsid-tick5.jar \<br>
+uk.ac.cam.your-crsid.tick5.RefactorLife [url/file] [index]</code></p></li><li class="listitem"><p><code class="code">java -cp world.jar:crsid-tick5.jar \<br>
+uk.ac.cam.your-crsid.tick5.RefactorLife [worldType] [url/file] [index]</code></p></li></ul></div><p>
+</p></div></div><p class="docfooter">Copyright 2008-2012 Alastair R. Beresford and Andrew C. Rice</p></body></html>

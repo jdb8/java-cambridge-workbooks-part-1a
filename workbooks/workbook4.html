@@ -1,0 +1,216 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Workbook 4</title><link rel="stylesheet" href="style.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><p class="docheader"><b>Java 1A Practical Class</b></p><div class="article" title="Workbook 4"><div class="titlepage"><div><div><h2 class="title"><a name="id2375675"></a>Workbook 4</h2></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#sec:introduction">Introduction</a></span></dt><dt><span class="section"><a href="#sec:managing-errors">Managing errors with Java Exceptions</a></span></dt><dt><span class="section"><a href="#sec:reading-data">Reading data from files and websites</a></span></dt><dt><span class="section"><a href="#sec:tick4">Java Tick 4</a></span></dt></dl></div><div class="section" title="Introduction"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:introduction"></a>Introduction</h2></div></div></div><p>The implementation of PatternLife you wrote last week is <em class="firstterm">brittle</em> in the sense that the program does not cope well when input data is malformed or missing. This week you will improve PatternLife using Java exceptions to handle erroneous or missing input data. In addition, you will learn how to read files from disk and from a website and use the retrieved data to initialise a Game of Life.
+</p><div class="important" title="Important" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Important</h3><p>The recommended text book for this course is <span class="emphasis"><em>Thinking in Java</em></span> by Bruce Eckel. You can download a copy of the 3rd Edition for free from Bruce's website:</p><p><a class="ulink" href="http://www.mindview.net/Books/TIJ/" target="_top">http://www.mindview.net/Books/TIJ/</a></p><p>Remember to check the course website regularly for announcements and errata:</p><p><a class="ulink" href="http://www.cl.cam.ac.uk/teaching/current/ProgJava" target="_top">http://www.cl.cam.ac.uk/teaching/current/ProgJava</a></p><p>You will find the Java standard library documentation useful:</p><p><a class="ulink" href="http://java.sun.com/javase/6/docs/api/" target="_top">http://java.sun.com/javase/6/docs/api/</a></p></div></div><div class="section" title="Managing errors with Java Exceptions"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:managing-errors"></a>Managing errors with Java Exceptions</h2></div></div></div><p>Try invoking your copy of PatternLife from last week as follows:
+
+</p><div class="itemizedlist"><ul class="itemizedlist" type="disc" compact><li class="listitem"><p><code class="code">java -jar crsid-tick3.jar</code></p></li><li class="listitem"><p><code class="code">java -jar crsid-tick3.jar "Glider:Richard Guy:20:20:1:"</code></p></li><li class="listitem"><p><code class="code">java -jar crsid-tick3.jar "Glider:Richard Guy:twenty:20:1:1:010 001 111"</code></p></li></ul></div><p>
+</p><p>What does your program print out in each of the above cases? It's likely that in each case your implementation will print out a <em class="firstterm">stack trace</em> which describes an error in the program. Here is a typical stack trace from a student submission:
+</p><pre class="programlisting">crsid@machine~&gt; java -jar crsid-tick3.jar "Glider:Richard Guy:20:20:1:"
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: 5
+        at uk.ac.cam.your-crsid.tick3.Pattern.&lt;init&gt;(Pattern.java:48)
+        at uk.ac.cam.your-crsid.tick3.PatternLife.main(PatternLife.java:96)
+</pre><p>
+In this case the input string <code class="code">"Glider:Richard Guy:20:20:1:"</code> provided on the command line to the program did not conform correctly to the specification described in Workbook 3. The stack trace explains where the error in the program occurred. The first line of the stack trace explains that an exception of the type <code class="code">java.lang.ArrayIndexOutOfBoundsException</code> occurred when the sixth element of the array was accessed. The remaining lines provide a little history of program execution which led the computer to make the array access which generated the exception. In this case, program execution was taking place at line 48 of <code class="code">Pattern.java</code> when the error occurred; this location was reached because the method on line 48 of <code class="code">Pattern.java</code> was invoked by the constructor on line 96 of <code class="code">PatternLife.java</code>. The detail in the stack trace helps the programmer determine why the error occurred and provides clues on how to fix it. 
+</p><p>The exception <code class="code">java.lang.ArrayIndexOutOfBoundsException</code> is actually a class inside the package <code class="code">java.lang</code>. The <code class="code">java.lang</code> package is special in Java because, unlike classes in all other packages, the contents of this package are always available in a Java program. Consequently, you can write <code class="code">ArrayIndexOutOfBoundsException</code> instead of <code class="code">java.lang.ArrayIndexOutOfBoundsException</code>.</p><p>Take a second look at each of the errors generated by your code with the three test cases mentioned at the start of this section. Can you determine which assumptions were made by your program which led to the error occurring? In some cases you can avoid generating errors by checking inputs carefully before using them; in other cases you will need to write additional code to <em class="firstterm">catch</em> the error and handle it. For example, you can probably avoid an exception of the type <code class="code">ArrayIndexOutOfBoundsException</code> by checking the <code class="code">length</code> field of the array before accessing particular elements of the array. In contrast, exceptions of the type <code class="code">NumberFormatException</code> need to be caught and handled appropriately.</p><p>If you need to handle an error, then you can do this by using a <em class="firstterm">try-catch</em> block. Consider the following example:
+
+</p><pre class="programlisting">int width;
+try {
+ width = Integer.parseInt("twenty"); //error: not an integer value
+} catch (NumberFormatException error) {
+ //handle the error, perhaps by using a default:
+ width = 10; 
+}
+</pre><p>
+The above code attempts to convert the Java string <code class="code">"twenty"</code> into a number, which fails since the contents of the string doesn't contain digits describing an integer literal. The static method <code class="code">parseInt</code> then <em class="firstterm">throws</em> an exception of type <code class="code">NumberFormatException</code> which is caught by the try-catch block. In the case above, the programmer has decided to hard-code the value of <code class="code">width</code> to <code class="code">10</code>. In some cases, using a default value like this is satisfactory. In the case of PatternLife, providing a default value for <code class="code">width</code> is not ideal because the programmer cannot know the size of the world the user wishes to simulate—this is why the format string provides the information in the first place!
+</p><p>In cases where no default value is sensible, the only option is to <code class="code">throw</code> an exception, as opposed to a normal return value, back to the calling method in the hope that this method might know what to do to handle the error. Ultimately, the programmer might not know what to do at any point in the program, in which case all the programmer can do is display an error message to the user. You will explore how to throw exceptions between methods after the next exercise.</p><p>In more complex cases, you may need to handle multiple types of exception separately. You can attach multiple <code class="code">catch</code> blocks to a single <code class="code">try</code> block as shown in the following example:
+</p><pre class="programlisting">try {
+ //code which may generate multiple types of exception
+} catch (TypeAException a) {
+ //handle TypeAException here
+} catch (TypeBException b) {
+ //handle TypeBException here
+}
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><p>Create a class called <code class="code">Repeat</code> in package <code class="code">uk.ac.cam.your-crsid.tick4</code> with the following contents:
+</p><pre class="programlisting">package uk.ac.cam.your-crsid.tick4;
+
+public class Repeat {
+ public static void main(String[] args) {
+  System.out.println(parseAndRep(args));
+ }
+
+ /*
+  * Return the first string repeated by the number of times
+  * specified by the integer in the second string, for example 
+  *   
+  *    parseAndRep(new String[]{"one","3"}) 
+  *
+  * should return "one one one". Adjacent copies of the repeated 
+  * string should be separated by a single space.
+  *
+  * Return a suitable error message in a string when there are 
+  * not enough arguments in "args" or the second argument is 
+  * not a valid positive integer. For example:
+  *
+  *  - parseAndRep(new String[]{"one"}) should return 
+  *    "Error: insufficient arguments"
+  *
+  *  - parseAndRep(new String[]{"one","five"}) should return 
+  *    "Error: second argument is not a positive integer"
+  */
+ public static String parseAndRep(String[] args) {
+  //TODO
+ }  
+}
+</pre><p>
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Complete the method <code class="code">parseAndRep</code> in the class <code class="code">Repeat</code>, taking care to adhere to the specification provided in the comment written above the method.</p></li></ol></div><p>You can test your implementation by passing zero, one or two arguments on the command line. Here is an example:
+</p><pre class="programlisting">crsid@machine:~&gt; java uk.ac.cam.your-crsid.tick4.Repeat "UoC" 5
+UoC UoC UoC UoC UoC
+crsid@machine:~&gt;
+</pre><p>
+</p></div><p>The error handling you provided in the <code class="code">Repeat</code> class above works well for the small example at hand, but passing around strings containing messages for the user is cumbersome and messy. As you have already seen for <code class="code">Integer.parseInt</code>, Java provides a mechanism for passing exceptions (as opposed to return values) between methods. In Java terminology, we say that a method <em class="firstterm">throws</em> an exception. For example, the <code class="code">Integer.parseInt</code> method throws an exception of type <code class="code">NumberFormatException</code>.
+</p><p>To throw an exception you use the keyword <code class="code">throw</code>. If the exception is thrown inside the body of a try-catch block, execution passes to the first line of the <code class="code">catch</code> body which catches an exception of the appropriate type. If the call to <code class="code">throw</code> is not contained within the body of a try-catch block, then the exception is propagated back to the method which invoked the current method, and so on recursively, until an enclosing try-catch block is found. If no try-catch block exists, then the java runtime halts the program and prints a stack trace, just as we saw earlier. Here is an example:
+</p><pre class="programlisting">package uk.ac.cam.your-crsid.tick4;
+
+class ExceptionTest {
+ public static void main(String[] args) {
+  System.out.print("C");
+  try {
+   a();
+  } catch (Exception e) {
+   System.out.print(e.getMessage());
+  }
+  System.out.println("A");
+ }
+
+ public static void a() throws Exception {
+   System.out.print("S");
+   b();
+   System.out.print("J");
+ }
+
+ public static void b() throws Exception {
+  System.out.print("T");
+  if (1+2+3==6)
+   throw new Exception("1");
+  System.out.print("V");
+ }
+}
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="2" type="1"><li class="listitem"><p>What does this program print out when executed? Type the program in to check your answer.</p></li></ol></div></div><p>In the above example you should have noticed that methods <code class="code">a</code> and <code class="code">b</code> have an extra phrase <code class="code">throws Exception</code> appended on the end of the method prototype. This phrase is required, and informs the programmer and the Java compiler that this method <span class="emphasis"><em>may</em></span> throw an exception of type <code class="code">Exception</code>. If you forget to type <code class="code">throws Exception</code>, then you will get a compile error; you may like to temporarily delete the phrase from your copy of <code class="code">ExceptionTest</code> to see the compile error.</p><p>A new exception can be defined by creating a new class and declaring that it is of type <code class="code">Exception</code>. For example the following code snippet creates a new exception called <code class="code">PatternFormatException</code>:
+</p><pre class="programlisting">package uk.ac.cam.your-crsid.tick4;
+
+public class PatternFormatException extends Exception {
+
+}
+</pre><p>
+
+This code should be placed in a file called <code class="code">PatternFormatException.java</code> inside a suitable directory structure to match the package declaration, just as you would do for any other class in Java. You can place methods and fields inside <code class="code">PatternFormatException</code>, just as you would in other Java classes. The syntax "<code class="code">extends Exception</code>" indicates that <code class="code">PatternFormatException</code> is of type <code class="code">Exception</code>. This is an example of <em class="firstterm">inheritance</em> in Java; you will learn more about inheritance in Workbook 5. In this workbook we will limit use of inheritance to the creation of new types of exception as shown above.</p><p>As you saw in the example above, if you throw a <code class="code">PatternFormatException</code> inside a method body and do not enclose the use of <code class="code">throw</code> inside a try-catch block, you should append "<code class="code">throws PatternFormatException</code>" on to the end of the method prototype. A method can throw more than one type of exception, in which case the method prototype should include a comma separated list of exceptions, such as "<code class="code">throws PatternFormatException, NumberFormatException</code>".</p><p>Java actually supports two types of exception: checked exceptions and unchecked exceptions, and some of the common exceptions in Java, such as <code class="code">NumberFormatException</code>, are unchecked exceptions. A piece of code which may potentially throw a checked exception <span class="emphasis"><em>must</em></span> either catch it in a try-catch block or declare that the method body may throw the exception; an unchecked exception does not need to be caught or declared thrown. When defining your own exceptions it is generally good programming practise to use checked exceptions (by inheriting from <code class="code">Exception</code> as shown earlier), and you should do so in all cases in this course.</p><div class="sidebar"><p class="title"><b></b></p><p>Your next task is to modify your implementation of Conway's Game of Life from last week to provide the user of your program with clear feedback on any errors in the format string. You should:
+
+</p><div class="orderedlist"><ol class="orderedlist" start="3" type="1"><li class="listitem"><p>Make a copy of <code class="filename">Pattern.java</code> and <code class="filename">PatternLife.java</code> which you wrote for Tick 3 and place them inside the package <code class="code">uk.ac.cam.your-crsid.tick4</code>.</p></li><li class="listitem"><p>Declare a new exception called <code class="code">PatternFormatException</code> inside the same package.</p></li><li class="listitem"><p>Modify your implementation of <code class="code">Pattern</code> so that the constructor for the class as well as the method <code class="code">initialise</code> throws <code class="code">PatternFormatException</code> when an error is discovered in the format string describing the world.</p></li><li class="listitem"><p>Catch the <code class="code">PatternFormatException</code> thrown by either the creation of an instance of <code class="code">Pattern</code> or by the use of the <code class="code">initialise</code> method inside the <code class="code">main</code> method of <code class="code">PatternLife</code>, and print out a helpful message describing the error to the user.</p></li></ol></div><p>
+</p><p>The following invocations of <code class="code">PatternLife</code> should print out helpful error messages. None should produce a stack trace.
+</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem"><p><code class="code">java uk.ac.cam.your-crsid.tick4.PatternLife</code></p></li><li class="listitem"><p><code class="code">java uk.ac.cam.your-crsid.tick4.PatternLife RandomString</code></p></li><li class="listitem"><p><code class="code">java uk.ac.cam.your-crsid.tick4.PatternLife \<br> "Glider:Richard Guy:20:20:1:"</code></p></li><li class="listitem"><p><code class="code">java uk.ac.cam.your-crsid.tick4.PatternLife \<br> "Glider:Richard Guy:a:b:1:1:010 001 111"</code></p></li><li class="listitem"><p><code class="code">java uk.ac.cam.your-crsid.tick4.PatternLife \<br> "Glider:Richard Guy:20:20:one:1:010 001 111"</code></p></li><li class="listitem"><p><code class="code">java uk.ac.cam.your-crsid.tick4.PatternLife \<br> "Glider:Richard Guy:20:20:1:1:010 0a1 111"</code></p></li></ul></div><p>
+</p><p>Do not forget to check that your program still produces the correct output if it is given a correctly formatted string.</p></div></div><div class="section" title="Reading data from files and websites"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:reading-data"></a>Reading data from files and websites</h2></div></div></div><p>In the rest of this Workbook you will improve the facilities used to load patterns in your implementation of Conway's Game of Life so that, by the end of this workbook, your program will be able to load patterns from files in the filesystem, or download them from websites. To do this we are going to investigate the Input-Output (IO) facilities available in the Java standard library. Handling input and output is a common source of errors in most programming languages because lots of things can go wrong: files might not exist, the contents of the file may be corrupt, or the network connection may disappear whilst data is being retrieved. Good IO programming requires careful checking of error conditions.</p><p>The Java IO standard library has two main methods of accessing data: Streams and Readers. Both of these mechanisms use exceptions to communicate erroneous states to the programmer using the library.  A Stream is used for reading and writing sequences of binary data—examples might be images or Java class files. A Reader is used for reading and writing sequences of characters—such
+as text files, or in case the case of this workbook, strings which specify the state of the world in the Game of Life. In principle, sequences of characters can be read using a Stream, however character data can be saved in a variety of different formats which the programmer would then have to interpret and decode. In contrast, a Reader presents the same interface to character data regardless of the underlying format.</p><p>Start a web browser and take a look at Sun's documentation for the <code class="code">Reader</code> class, paying particular attention to the methods defined for reading characters. For example, the method prototype <code class="code">int read(char[] cbuf)</code> describes a method which reads data into a <code class="code">char</code> array and may throw an <code class="code">IOException</code> if an error occurs during the reading process; the return value indicates the number of characters read or -1 if no more data is available. You may have noticed that the <code class="code">Reader</code> class is an <em class="firstterm">abstract</em> class; the details of what an abstract class is and how to use it will be described in Workbook 5. This week it is sufficient to appreciate that an abstract class provides a specification which describes how a specific implementation of a "<code class="code">Reader</code>" must behave. For example, <code class="code">FileReader</code> provides a concrete implementation of <code class="code">Reader</code>, and is able to read data from files in the filesystem.</p><p>Now is an appropriate point to explore how <code class="code">System.out.println</code> works. The <code class="code">System</code> class is part of the package <code class="code">java.lang</code> and is therefore available by default. If you look for the class <code class="code">System</code> in Sun's documentation, you see that it has a public static field called <code class="code">out</code> of type <code class="code">PrintStream</code>.<sup>[<a name="id2658464" href="#ftn.id2658464" class="footnote">1</a>]</sup> If you view the documentation for <code class="code">PrintStream</code> you will see that the field <code class="code">out</code> supports a variety of method calls including the now familiar <code class="code">println</code> method. For completeness, the interested reader might like to explore what <code class="code">System.err</code> and <code class="code">System.in</code> do too.</p><p>Your final task this week is to write a new class called <code class="code">PatternLoader</code>, which is capable of loading patterns from the disk or downloading them from a website. Create a new class with the following contents, making sure you give the class the correct filename and you place it in an appropriate directory structure:
+</p><pre class="programlisting">package uk.ac.cam.your-crsid.tick4;
+
+import java.io.Reader;
+import java.io.IOException;
+import java.util.List;
+
+public class PatternLoader {
+
+	public static List&lt;Pattern&gt; load(Reader r) throws IOException {
+		//TODO: Complete the implementation of this method.
+	}
+}   
+</pre><p>This class introduces a number of new concepts which require further explanation. You should read the rest of this section of the workbook before completing your implementation of <code class="code">PatternLoader</code>.</p><p>In your implementation of <code class="code">PatternLoader</code> you will need to make use of some classes in the standard library such as <code class="code">Reader</code> which you looked up in the documentation earlier. To save you from typing <code class="code">java.io.Reader</code> at every point in the program when you want to refer to the <code class="code">Reader</code> class, the code above makes use of the <code class="code">import</code> statement. The statement "<code class="code">import java.io.Reader</code>;" tells the compiler that all occurrences of <code class="code">Reader</code> in the source file actually refer to <code class="code">java.io.Reader</code>. Using the <code class="code">import</code> statement will save you some typing, make your code more readable, and provide you with an explicit list of dependencies for the program at the top of the source file.</p><p>There is nothing special about classes defined in the standard library. For example, including
+</p><pre class="programlisting">import uk.ac.cam.your-crsid.tick1.TestBit;
+</pre><p>
+
+at the top of a Java source file would allow you to write <code class="code">TestBit</code> to refer to your implementation of <code class="code">uk.ac.cam.your-crsid.tick1.TestBit</code> you wrote for Tick 1.
+</p><p>You may recall from last week that a <code class="code">static</code> method is associated with a class rather than an instance of a class. Therefore you can make use of <code class="code">PatternLoader</code> just as you used <code class="code">PackedLong</code> in previous weeks—as a library of useful methods which you can call without first creating an instance of class <code class="code">PatternLoader</code>. For example, to call the <code class="code">load</code> method from another class, you simply write <code class="code">PatternLoader.load</code> followed by a reference to a <code class="code">Reader</code> object inside round brackets.</p><p>The <code class="code">load</code> method takes a single argument of type <code class="code">Reader</code>. When the load method is invoked, a specific kind of <code class="code">Reader</code> will be provided (for example, a <code class="code">FileReader</code>). By specifying the type of the argument to <code class="code">load</code> as <code class="code">Reader</code> the method is agnostic to the actual type of <code class="code">Reader</code> provided: the implementation of <code class="code">load</code> does not need to consider where the data is coming from—it can simply read characters using the support provided by the particular instance of <code class="code">Reader</code> provided by the calling method.</p><p>The return type of the <code class="code">load</code> method is <code class="code">List&lt;Pattern&gt;</code>.  A <code class="code">List</code> is another class from the Java standard library. A <code class="code">List</code> records an ordered sequence of items and the main difference between a <code class="code">List</code> and a Java array is that a list can change its size dynamically: the programmer can add or delete items to it without stating how large it should be in advance. The phrase "<code class="code">&lt;Pattern&gt;</code>" is an example of something called Java generics, the details of which are beyond the scope of this course. 
+This year, all you need to know is how to <span class="emphasis"><em>use</em></span> classes which use Java generics. As you've seen already, all you need to do is provide the class you want to use inside the angle brackets (<code class="code">&lt;</code> and <code class="code">&gt;</code>). For example, <code class="code">List&lt;Pattern&gt;</code> is a <code class="code">List</code> which stores elements of type <code class="code">Pattern</code>; you will learn more about Java generics next year.</p><p>The phrase "<code class="code">throws IOException</code>" states that the <code class="code">load</code> method <span class="emphasis"><em>may</em></span> throw an exception of type <code class="code">IOException</code>. The <code class="code">IOException</code> class is defined as part of the Java standard library and is used to communicate that something unexpected happened whilst data was read or written. For example, if the network connection to the computer breaks whilst a Java program is downloading content from a website, then the <code class="code">Reader</code> object may throw an <code class="code">IOException</code>.</p><p>To complete <code class="code">PatternLoader</code> you will need to implement the method <code class="code">load</code>, which should read all the data available from the <code class="code">Reader</code> object reference <code class="code">r</code>, and create a <code class="code">List&lt;Pattern&gt;</code> object. The type of the return value provides a strong hint that your implementation of the <code class="code">load</code> method may well find several pattern strings available in the input. Therefore some method of separating patterns in the input stream is required.</p><p>A common technique for separating text data in Unix-like systems such as Linux is to look for "new line" characters, which in Java are written using the character literal <code class="code">'\n'</code> and appear as new lines when printed. In contrast, Windows usually uses separate characters for "new line" (<code class="code">'\n'</code>) and "carriage return" (<code class="code">'\r'</code>) and therefore it's also common to see the two character string <code class="code">"\r\n"</code> as a line separator. You might like to try writing a simple test program which executes:
+</p><pre class="programlisting">System.out.println("A sentence on one line.\nThis is on a second line.");
+</pre><p>
+and examine the output. This course will use a Unix-style line separator to place multiple patterns into a single file.
+</p><p>The methods provided by <code class="code">Reader</code> do not provide a mechanism for dividing the input based on the presence of new line characters. This is because the <code class="code">Reader</code> class provides low-level access to character data. The functionality to split on new lines is provided by <code class="code">BufferedReader</code>; this functionality is possible with <code class="code">BufferedReader</code> because the class caches data read internally, allowing the class to search for new line characters in its cache. If you check the documentation for <code class="code">BufferedReader</code> you will see it provides a <code class="code">readLine</code> method which will read a line from the underlying reader and return a reference to a <code class="code">String</code> object containing the data, or alternatively return <code class="code">null</code> if there are no more lines to be read. The method <code class="code">readLine</code> will function correctly regardless of whether Unix- or Windows-style line separators are used. You can create a reference to a <code class="code">BufferedReader</code> object by passing an instance of the <code class="code">Reader</code> object in as an argument to the constructor:
+</p><pre class="programlisting">BufferedReader buff = new BufferedReader(r);
+</pre><p> 
+</p><p>To complete your implementation of <code class="code">load</code> you will also need to create an instance of <code class="code">List</code> to save Patterns as you load them:</p><pre class="programlisting">List&lt;Pattern&gt; resultList = new LinkedList&lt;Pattern&gt;();
+</pre><p>Just as we saw earlier with the <code class="code">Reader</code> class, the <code class="code">List</code> class may have multiple implementations; in the case above, we use the <code class="code">LinkedList</code> implementation. Given an instance of type <code class="code">List</code> you can then add objects of the correct type as follows:
+
+</p><pre class="programlisting">Pattern p = ....
+resultList.add(p);
+</pre><p>
+</p><p>You can determine the current number of elements stored in a <code class="code">List</code> object by using the <code class="code">size</code> method, and retrieve elements using the <code class="code">get</code> method; Sun's documentation contains further detail which you will need to review. There is also a special for-loop syntax for Java Collection objects such as <code class="code">List</code> which allows you to iterate though all the elements in the list:
+
+</p><pre class="programlisting">for(Pattern p: resultList) {
+ //p references each element of "resultList" in order so that first time
+ //round the loop, p references the first element, second time round the 
+ //second element, and so on. The loop terminates when "resultList" has
+ //no more elements.
+}
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="7" type="1"><li class="listitem"><p>Complete your implementation of <code class="code">load</code>. Your implementation should read in all available patterns from the <code class="code">Reader</code> object, convert the pattern strings into <code class="code">Pattern</code> objects, and store all valid patterns in a <code class="code">List</code> object. Your <code class="code">load</code> method should return the <code class="code">List</code> object to the caller. If the <code class="code">Reader</code> object contains no valid patterns, your implementation should return an empty <code class="code">List</code> object.
+</p></li></ol></div></div><p>Now add the following two methods to your implementation of <code class="code">PatternLoader</code>:</p><pre class="programlisting">public static List&lt;Pattern&gt; loadFromURL(String url) throws IOException {
+ URL destination = new URL(url);
+ URLConnection conn = destination.openConnection();
+ return load(new InputStreamReader(conn.getInputStream()));
+}
+
+public static List&lt;Pattern&gt; loadFromDisk(String filename) throws IOException {
+ return load(new FileReader(filename));
+}
+</pre><p>These two methods use your <code class="code">load</code> method to load patterns from either a file on disk or a website.  They do this by constructing a suitable <code class="code">Reader</code> object and passing a reference to it to your method. Since your method is agnostic to the type of <code class="code">Reader</code> provided, your implementation of <code class="code">load</code> will function with data from either disk or from the web. You will need to add <code class="code">import</code> statements to describe the location of the extra classes used inside the method bodies of <code class="code">loadFromURL</code> and <code class="code">loadFromDisk</code>; you can find the full names for the classes by looking them up in the Java documentation.</p></div><div class="section" title="Java Tick 4"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:tick4"></a>Java Tick 4</h2></div></div></div><p>Copy your implementation of <code class="code">PatternLife</code> which you wrote earlier in this workbook, rename it <code class="code">LoaderLife</code> and put it inside the package <code class="code">uk.ac.cam.your-crsid.tick4</code>. You should modify <code class="code">LoaderLife</code> so that an invocation of <code class="code">LoaderLife</code> with a single argument will print out the details of all the <span class="emphasis"><em>valid</em></span> patterns found in a file or on a website. Each valid pattern should be prefixed by the index number of the pattern in the source file or webpage, starting at zero. For example, if the filename <code class="filename">MyPatterns.txt</code> is provided as the single argument, and the file <code class="filename">MyPatterns.txt</code> contains a single pattern describing a Glider, then your program should output:
+</p><pre class="programlisting">crsid@machine:~&gt; java uk.ac.cam.your-crsid.tick4.LoaderLife MyPatterns.txt
+0) Glider:Richard Guy (1970):20:20:1:1:010 001 111
+crsid@machine:~&gt;
+</pre><p>
+</p><p>Similarly, if your program receives a valid URL as a single argument on the command line then your program should load data from the URL and display any valid patterns found. For example,
+</p><pre class="programlisting">crsid@machine:~&gt; java uk.ac.cam.your-crsid.tick4.LoaderLife \
+http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt
+0) Glider:Richard Guy (1970):8:8:1:1:010 001 111
+1) [additional patterns should be listed here]
+2)  ...
+crsid@machine:~&gt;
+</pre><p>
+The URL used in the example above contains many interesting worlds which you might like to view. You may also like to load entries provided by students who have completed Tick 3*, which are available from:
+</p><pre class="programlisting">http://www.cl.cam.ac.uk/teaching/current/ProgJava/competition.txt
+</pre><p>
+</p><p>To complete this part of the Tick successfully, you will need some method of determining whether the string provided on the command line is a filename or a URL. You might like to use the <code class="code">startsWith</code> method of the <code class="code">String</code> class to determine whether the string starts with "<code class="code">http://</code>" or not.
+</p><p>If your implementation of <code class="code">LoaderLife</code> is invoked with two arguments on the command line, your program should should treat the first argument as a pattern source as above, and the second as the pattern index to initialize a world with, and display successive generations of the world to the user as you have done in previous weeks. For example, the following invocation of <code class="code">LoaderLife</code>
+</p><pre class="programlisting">crsid@machine:~&gt; java uk.ac.cam.your-crsid.tick4.LoaderLife \
+http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt 0
+-
+________
+___#____
+_#_#____
+__##____
+________
+________
+________
+________
+</pre><p>
+displays successive generations of a Glider just as <code class="code">PatternLife</code> did last week.</p><p><span class="emphasis"><em>Important: your program should handle all exceptions gracefully by printing an error message to the user describing what has gone wrong and exiting cleanly.</em></span> You will find it useful to pipe (<code class="code">|</code>) the output of your Java program into the command line program <code class="code">less</code> to view long lists of patterns such as those downloadable from the course website; if you do so <span class="keycap"><strong>q</strong></span> can be used to quit the program <code class="code">less</code> once you have located the index of a pattern you would like to view. In other words, you can type:
+</p><pre class="programlisting">crsid@machine:~&gt; java uk.ac.cam.your-crsid.tick4.LoaderLife \
+http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt | less
+</pre><p>
+</p><p>Once you believe you have completed all the exercises in this workbook successfully, you should produce a jar file called <code class="filename">crsid-tick4.jar</code> with the following contents:
+
+</p><pre class="programlisting">META-INF
+META-INF/MANIFEST.MF
+uk/ac/cam/your-crsid/tick4/Repeat.java
+uk/ac/cam/your-crsid/tick4/Repeat.class
+uk/ac/cam/your-crsid/tick4/ExceptionTest.java
+uk/ac/cam/your-crsid/tick4/ExceptionTest.class
+uk/ac/cam/your-crsid/tick4/Pattern.java
+uk/ac/cam/your-crsid/tick4/Pattern.class
+uk/ac/cam/your-crsid/tick4/PatternLife.java
+uk/ac/cam/your-crsid/tick4/PatternLife.class
+uk/ac/cam/your-crsid/tick4/PatternLoader.java
+uk/ac/cam/your-crsid/tick4/PatternLoader.class
+uk/ac/cam/your-crsid/tick4/PatternFormatException.java
+uk/ac/cam/your-crsid/tick4/PatternFormatException.class
+uk/ac/cam/your-crsid/tick4/LoaderLife.java
+uk/ac/cam/your-crsid/tick4/LoaderLife.class
+</pre><p>
+</p><p>You should set the entry point of the jar file to <code class="code">uk.ac.cam.your-crsid.tick4.LoaderLife</code> so you can execute your implementation of <code class="code">LoaderLife</code> without explicitly specifying a class to execute. To submit your work, email your jar file to <code class="code">ticks1a-java@cl.cam.ac.uk</code>.</p></div><div class="footnotes"><br><hr width="100" align="left"><div class="footnote"><p><sup>[<a name="ftn.id2658464" href="#id2658464" class="para">1</a>] </sup>The astute reader will have noticed that we stated earlier that a <code class="code">Reader</code> should be used for character data and the type of <code class="code">System.out</code> is <code class="code">PrintStream</code>! This is because <code class="code">Reader</code> was not introduced into Java until version 1.1.</p></div></div></div><p class="docfooter">Copyright 2008-2012 Alastair R. Beresford and Andrew C. Rice</p></body></html>

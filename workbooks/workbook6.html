@@ -1,0 +1,487 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Workbook 6</title><link rel="stylesheet" href="style.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><p class="docheader"><b>Java 1A Practical Class</b></p><div class="article" title="Workbook 6"><div class="titlepage"><div><div><h2 class="title"><a name="id2700420"></a>Workbook 6</h2></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#sec:introduction">Introduction</a></span></dt><dt><span class="section"><a href="#sec:swing">Java Swing</a></span></dt><dt><span class="section"><a href="#sec:jcomponent">Nested components</a></span></dt><dt><span class="section"><a href="#sec:source-panel">Source Panel</a></span></dt><dt><span class="section"><a href="#sec:load-pattern-list">Loading a list of patterns</a></span></dt><dt><span class="section"><a href="#sec:control">Control Panel</a></span></dt><dt><span class="section"><a href="#sec:main">Game Panel</a></span></dt><dt><span class="section"><a href="#sec:show%20world">Graphical world (Optional)</a></span></dt><dt><span class="section"><a href="#sec:tick6">Tick 6</a></span></dt></dl></div><div class="section" title="Introduction"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:introduction"></a>Introduction</h2></div></div></div><p>
+Last week you applied some basic software design principles to your program. You used an interface to provide abstraction, allowing several alternative storage implementations to be written and easily substituted for one another. In addition, you used inheritance to share code between those implementations. This week you are going build your own graphical interface with Java Swing in order to make your program more accessible to other users.
+</p><div class="important" title="Important" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Important</h3><p>You may find Sun's Swing Tutorial helpful:</p><p><a class="ulink" href="http://java.sun.com/docs/books/tutorial/uiswing/" target="_top">http://java.sun.com/docs/books/tutorial/uiswing/</a></p><p>Remember to check the course website regularly for announcements and errata:</p><p><a class="ulink" href="http://www.cl.cam.ac.uk/teaching/current/ProgJava" target="_top">http://www.cl.cam.ac.uk/teaching/current/ProgJava</a></p></div></div><div class="section" title="Java Swing"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:swing"></a>Java Swing</h2></div></div></div><p>Java Swing is a graphical user interface supported by the Java standard library which supports a vast range of graphical components. Components include <em class="firstterm">widgets</em> such as buttons, menus and text boxes, as well as <em class="firstterm">containers</em> which may contain (and control the layout) of any widgets or containers within them. Because containers may themselves contain containers, a typical graphical interface in Swing is built by recursively nesting containers and widgets. You will use this technique in this workbook to layout a graphical interface for the Game of Life.
+</p><p>To create a new Swing application you will need to create a window to display your graphical components. A window in Swing is created by creating an instance of <code class="code">JFrame</code>. Here is a simple example:
+</p><pre class="programlisting">
+package uk.ac.cam.your-crsid.tick6;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class HelloSwingWorld extends JFrame {
+ HelloSwingWorld() {
+  super("Hello Swing");                    //create window &amp; set title text
+  setDefaultCloseOperation(EXIT_ON_CLOSE); //close button on window quits app.
+  JLabel text = new JLabel("Hello Swing"); //create graphical text label
+  add(text);                               //associate "text" with window
+  setSize(320,240);                        //set size of window
+ }
+ public static void main(String[] args) {
+  HelloSwingWorld hello = new HelloSwingWorld(); //create instance 
+  hello.setVisible(true);                        //display window to user
+ }
+}
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>Type in <code class="code">HelloSwingWorld</code>, compile it and run it.</p></li></ol></div></div><p>As you can see, writing a basic graphical interface is quite simple. The <code class="code">import</code> statements tell Java that the definitions of <code class="code">JFrame</code> and <code class="code">JLabel</code> are inside the package <code class="code">javax.swing</code>. You might like to look at the documentation for these widgets in the Java documentation.</p><p>In the example above, <code class="code">HelloSwingWorld</code> extends <code class="code">JFrame</code> to create a new window. The use of inheritance used here, whilst optional, is convenient since it makes it easy to invoke the methods <code class="code">setDefaultCloseOperation</code>, <code class="code">add</code>, <code class="code">setSize</code> and <code class="code">setVisible</code>.</p><p>An instance of <code class="code">JLabel</code> represents a string on the graphical interface; note however that the <code class="code">add</code> method must be called to attach the instance called <code class="code">text</code> to the instance of <code class="code">HelloSwingWorld</code> created in the constructor. The <code class="code">setSize</code> operator configures the default size of the window when it is created, although the user can change the size at run-time (try resizing the window yourself to see what happens). Finally, <code class="code">setVisible</code> is called to display the window to the user; if you forget to call <code class="code">setVisible</code> with the argument <code class="code">true</code>, your graphical interface will not be displayed and your program will terminate instead.</p><p>In order to create more complicated graphical interfaces, you will need to tell Swing how to layout the elements in the window. In order to get a visual impression of the layout options, take a look at the layouts described in the Swing tutorial: <a class="ulink" href="http://java.sun.com/docs/books/tutorial/uiswing/layout/visual.html" target="_top">http://java.sun.com/docs/books/tutorial/uiswing/layout/visual.html</a>. You do not need to work through the tutorial now, although you might like to look at it if you get stuck or you want to know more. There are eight layout types: <code class="code">BorderLayout</code>, <code class="code">BoxLayout</code>, <code class="code">CardLayout</code>, <code class="code">FlowLayout</code>, <code class="code">GridBagLayout</code>, <code class="code">GridLayout</code>, <code class="code">GroupLayout</code> and <code class="code">SpringLayout</code>.</p><p>In order to create a graphical interface for the Game of Life, the screen should be divided up as shown in <a class="xref" href="#fig:screen-layout" title="Figure 1. Layout of GUI for the Game of Life; the left shows the GUI, and the right shows the names of the main interface containers">Figure 1, “Layout of GUI for the Game of Life; the left shows the GUI, and the right shows the names of the main interface containers”</a>. Controlling the size of each of the components as the window is resized is important: the window should make good use of the display area whatever the size of the window. It is a bad idea to assume that the window is of a fixed size, since the size of screens varies between computers, and some users may prefer the window to occupy only a portion of the desktop in order to view multiple applications simultaneously. The decision of how best to use the space available in the window is application specific.</p><div class="figure"><a name="fig:screen-layout"></a><div class="figure-contents"><div class="mediaobject"><img src="figures/guilife-panels.png" alt="Layout of GUI for the Game of Life"></div></div><p class="title"><b>Figure 1. Layout of GUI for the Game of Life; the left shows the GUI, and the right shows the names of the main interface containers</b></p></div><br class="figure-break"><p>When resizing the graphical interface for the Game of Life, the main window should grow or shrink the Game Panel depending on the space available; in contrast the size of the Options Panel should remain fixed. The Options Panel (which contains the Source Panel, Pattern Panel, and Control Panel) should take up only the space which is necessary to display the widgets within it. This kind of control over resizing can be achieved using <code class="code">BorderLayout</code>. Below is an example program which demonstrates how to use this layout type.
+</p><pre class="programlisting">
+package uk.ac.cam.your-crsid.tick6;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class GuiLife extends JFrame {
+ public GuiLife() {
+  super("Coloured Boxes");
+  setSize(640,480);
+  setDefaultCloseOperation(EXIT_ON_CLOSE);
+  setLayout(new BorderLayout());
+
+  JPanel optionsPanel = createOptionsPanel();
+  add(optionsPanel,BorderLayout.WEST);
+
+  JPanel gamePanel = createGamePanel();
+  add(gamePanel,BorderLayout.CENTER);
+ }
+
+ private JPanel createOptionsPanel() {
+  //TODO
+ }
+
+ private JPanel createGamePanel() {
+  JPanel result = new JPanel();
+  result.setBackground(Color.GREEN);
+  return result;
+ }
+
+ public static void main(String[] args) {
+  GuiLife gui = new GuiLife();
+  gui.setVisible(true);
+ }
+}
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="2" type="1"><li class="listitem"><p>Type in <code class="code">GuiLife</code> and complete the method <code class="code">createOptionsPanel</code> which should create a new instance of <code class="code">JPanel</code>, set the background colour to <code class="code">Color.BLUE</code> and return a reference to the new instance of <code class="code">JPanel</code> you created to the caller.</p></li></ol></div></div><p>If you run the program <code class="code">GuiLife</code> and resize the window, you should find that the green area (a placeholder for the Game Panel) takes up all the additional space made available through expanding the size of the window, and the size of the blue area (a placeholder for the Options Panel) remains fixed. This is just the behaviour required for the graphical interface for the Game of Life. The window behaves in this way because the behaviour of <code class="code">BorderLayout</code> is to resize the "center" panel in preference to any other panels which might exist.</p></div><div class="section" title="Nested components"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:jcomponent"></a>Nested components</h2></div></div></div><p>In the previous section you created a window which used <code class="code">BorderLayout</code> to control the layout of the window. We will now add further components to the Options Panel to hold the Source Panel, Pattern Panel and Control Panel. Below is a program which, when completed, will create space for all the key parts of our graphical interface.
+</p><pre class="programlisting">
+package uk.ac.cam.your-crsid.tick6;
+
+import java.awt.BorderLayout;
+import javax.swing.border.Border;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.border.EtchedBorder;
+
+public class GuiLife extends JFrame {
+
+ public GuiLife() {
+  super("GuiLife");
+  setSize(640, 480);
+  setDefaultCloseOperation(EXIT_ON_CLOSE);
+  setLayout(new BorderLayout());
+  JComponent optionsPanel = createOptionsPanel();
+  add(optionsPanel, BorderLayout.WEST);
+  JComponent gamePanel = createGamePanel();
+  add(gamePanel, BorderLayout.CENTER);
+ }
+
+ private JComponent createOptionsPanel() {
+  Box result = Box.createVerticalBox();
+  result.add(createSourcePanel());
+  result.add(createPatternPanel());
+  result.add(createControlPanel());
+  return result;
+ }
+
+ private void addBorder(JComponent component, String title) {
+  Border etch = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
+  Border tb = BorderFactory.createTitledBorder(etch,title);
+  component.setBorder(tb);
+ }
+
+ private JComponent createGamePanel() {
+  JPanel holder = new JPanel();
+  addBorder(holder,Strings.PANEL_GAMEVIEW);
+  JPanel result = new JPanel();
+  holder.add(result);
+  return new JScrollPane(holder);
+ }
+
+ private JComponent createSourcePanel() {
+  JPanel result = new JPanel();
+  addBorder(result,Strings.PANEL_SOURCE);
+  return result; 
+ }
+
+ private JComponent createPatternPanel() { /*TODO*/ }
+ private JComponent createControlPanel() { /*TODO*/ }
+
+ public static void main(String[] args) {
+  GuiLife gui = new GuiLife();
+  gui.setVisible(true);
+ }
+}
+</pre><p>
+</p><p>In the example program, the Options Panel is created as a container with a vertical <code class="code">BoxLayout</code> layout; such a component places all the components within itself vertically. The layout of widgets inside a container such as the Options Panel is quite flexible in Swing. Widgets have three sets of dimensions: a minimum size, a preferred size, and a maximum size. In the case of a vertical <code class="code">BoxLayout</code> as used in the Options Panel, Swing attempts to provide space for widgets at their preferred size. More information on the resizing of widgets using a particular layout with Swing can be found in Sun's documentation for the appropriate layout class.</p><p>In the example above, you may have noticed there is a new object called <code class="code">Strings</code>. This is in fact another class in the same package as <code class="code">GuiLife</code> which contains all of the text data used in the graphical interface. It's a good idea to collect together all the strings used in the interface in one place so that they are easy to modify; this is especially useful if you wish to update the application so that it supports multiple languages. The contents of <code class="code">Strings</code> should be as follows:
+</p><pre class="programlisting">
+package uk.ac.cam.your-crsid.tick6;
+
+public class Strings {
+ public static final String PANEL_SOURCE = "Source";
+ public static final String PANEL_PATTERN = "Starting pattern";
+ public static final String PANEL_CONTROL = "Control";
+ public static final String PANEL_GAMEVIEW = "Game State";
+}
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="3" type="1"><li class="listitem"><p>Place the contents of <code class="code">Strings</code> as defined above into a suitable file and directory structure.</p></li><li class="listitem"><p>Replace the your copy of <code class="code">GuiLife</code> with the new one provided in this section.</p></li><li class="listitem"><p>Complete the methods <code class="code">createPatternPanel</code>, and <code class="code">createControlPanel</code> in <code class="code">GuiLife</code>. Your implementations should create a new instance of <code class="code">JPanel</code>, add a border to the panel using <code class="code">addBorder</code>, and return a reference to the instance of <code class="code">JPanel</code> which you created; you should use a suitable field from <code class="code">Strings</code> for the border text. You might find reading the body of <code class="code">createSourcePanel</code> helpful.</p></li><li class="listitem"><p>Run your improved version of <code class="code">GuiLife</code>. You should see that the screen is now split into four areas, although the text associated with the etched borders will not be entirely visible for the three panels in the left half of the screen. This is okay at the moment.</p></li></ol></div></div></div><div class="section" title="Source Panel"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:source-panel"></a>Source Panel</h2></div></div></div><p>In the previous section, you created space for the four main elements of the final graphical display. In this section you will complete the body of the Source Panel. The Source Panel will eventually allow the user to select the source of the patterns for the initial state of the world. Possible sources could include a file in the file system, or a URL. This week you will add support for four possible input methods on the display, none of which will actually function! Next week you will implement the code to make them work.</p><p>In your application you will only ever have one source at a time, and therefore a user interface component which only allows the user to select a single source is required. One such user interface component is the <em class="firstterm">Radio Button</em> which provides the user with a selection from one of several alternatives.</p><p>To use a Radio Button in your implementation of Source Panel you should create a separate class to contain the details of the widgets used. Below is a partially complete implementation of <code class="code">SourcePanel</code> which uses <code class="code">JRadioButton</code> widgets to control user selection of the source of patterns for the Game of Life.
+</p><pre class="programlisting">
+package uk.ac.cam.your-crsid.tick6;
+
+//TODO: specify the appropriate import statements
+
+public class SourcePanel extends JPanel {
+
+ public SourcePanel() {
+  super();
+  setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
+  JRadioButton none = new JRadioButton(Strings.BUTTON_SOURCE_NONE, true);
+  JRadioButton file = new JRadioButton(Strings.BUTTON_SOURCE_FILE, true);
+  JRadioButton library = new JRadioButton(Strings.BUTTON_SOURCE_LIBRARY, true);
+  JRadioButton fourStar = new JRadioButton(Strings.BUTTON_SOURCE_FOURSTAR, true);  
+  //add RadioButtons to this JPanel
+  add(none);
+  add(file);
+  add(library);
+  add(fourStar);
+  //create a ButtonGroup containing all four buttons
+  //Only one Button in a ButtonGroup can be selected at once
+  ButtonGroup group = new ButtonGroup();
+  group.add(none);
+  group.add(file);
+  group.add(library);
+  group.add(fourStar);
+ }
+}
+</pre><p>
+</p><p>The class <code class="code">SourcePanel</code> extends <code class="code">JPanel</code>, creating a new interface component which you can add to an existing <code class="code">JFrame</code> or <code class="code">JComponent</code>. The constructor for <code class="code">SourcePanel</code> first calls the default constructor of the super class, and then configures the layout for this component as a <code class="code">BoxLayout</code> with components laid horizontally. Four new instances of <code class="code">RadioButton</code> are created, and these are then added to the current instance of <code class="code">SourcePanel</code> under construction using the <code class="code">add</code> method supplied by the parent class. The remainder of the constructor creates a new instance of <code class="code">ButtonGroup</code> and then adds the instances of <code class="code">JRadioButton</code> to it; <code class="code">ButtonGroup</code> prevents more than one <code class="code">JRadioButton</code> instance in the group from being selected at the same time.</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="7" type="1"><li class="listitem"><p>Place the code above for <code class="code">SourcePanel</code> inside a suitable class and package structure, and use Sun's Java documentation to determine the appropriate import statements for the class.</p></li><li class="listitem"><p>Create four new entries inside your <code class="code">Strings</code> class to provide textual data for the Java <code class="code">String</code> literals used in the <code class="code">JRadioButton</code> objects created in <code class="code">SourcePanel</code>. The <code class="code">String</code> literals should be <code class="code">"None"</code>, <code class="code">"File"</code>, <code class="code">"Library"</code>, and <code class="code">"4* Submissions"</code>.</p></li><li class="listitem"><p>Update your implementation of the method <code class="code">createSourcePanel</code> inside <code class="code">GuiLife</code> to create a new instance of <code class="code">SourcePanel</code> instead of <code class="code">JPanel</code>.</p></li><li class="listitem"><p> Run <code class="code">GuiLife</code>. You should see four radio buttons inside the Source Panel with appropriate text labels. It should only be possible to select a single radio button at a time. Compare your implementation of the Source Panel with that shown in Figure 1.</p></li></ol></div></div></div><div class="section" title="Loading a list of patterns"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:load-pattern-list"></a>Loading a list of patterns</h2></div></div></div><p>In this section you will load a list of patterns into the Pattern Panel. To do so, you will need to use the <code class="code">JList</code> object to contain the list of patterns. The <code class="code">JList</code> component should be placed inside a <code class="code">JScrollPane</code>, which adds scroll bars to the list; this is required since the number of patterns may be quite large and you will not want the window to grow too large. Here is an outline of the code needed to implement the Pattern Panel:
+</p><pre class="programlisting">
+package uk.ac.cam.your-crsid.tick6;
+
+//TODO:  specify the appropriate import statements
+
+public class PatternPanel extends JPanel {
+
+ private JList guiList;
+ 
+ public PatternPanel() {
+  super();
+  setLayout(new BorderLayout());
+  guiList = new JList();
+  add(new JScrollPane(guiList));
+ }
+
+ public void setPatterns(List&lt;Pattern&gt; list) {
+  ArrayList&lt;String&gt; names = new ArrayList&lt;String&gt;();
+
+  //TODO: Using a for loop which iterates over the items
+  //      in "list" and adds the pattern name and pattern
+  //      author to "names". For example, if the pattern
+  //      name and author is "Glider" and "Richard Guy 1970"
+  //      then you should add the string:
+  //
+  //                "Glider (Richard Guy 1970)"
+  //
+  //      to "names" using the method "add" on "names".
+  
+  guiList.setListData(names.toArray());
+ } 
+}
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="11" type="1"><li class="listitem"><p> Copy across your implementation of <code class="code">Pattern</code>, <code class="code">PatternLoader</code>, <code class="code">PatternFormatException</code>, <code class="code">WorldImpl</code>, <code class="code">PackedWorld</code>, <code class="code">ArrayWorld</code>, <code class="code">AgingWorld</code> and <code class="code">PackedLong</code> from last week into the package <code class="code">uk.ac.cam.your-crsid.tick6</code>; remember to update the package statements at the top of these files accordingly.</p></li><li class="listitem"><p> Place the code above for <code class="code">PatternPanel</code> inside a suitable class and package structure, and use Sun's Java documentation to determine the appropriate import statements for the class.</p></li><li class="listitem"><p> Complete the body of <code class="code">setPatterns</code> to add a string for each of the patterns found in <code class="code">list</code> into the local array of strings called <code class="code">names</code>.</p></li><li class="listitem"><p> Create a new field called <code class="code">patternPanel</code> of type <code class="code">PatternPanel</code> inside the class <code class="code">GuiLife</code>.</p></li><li class="listitem"><p> Update your implementation of the method <code class="code">createPatternPanel</code> inside <code class="code">GuiLife</code> to create a new instance of <code class="code">PatternPanel</code> instead of <code class="code">JPanel</code>. Your implementation should ensure that the field you created in the previous step references the new instance you create in this method.</p></li></ol></div></div><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="16" type="1"><li class="listitem"><p> Add the following lines of code immediately after the definition of the variable <code class="code">gui</code> in the <code class="code">main</code> method of <code class="code">GuiLife</code>:
+</p><pre class="programlisting">
+try {
+ String url="http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt";
+ List&lt;Pattern&gt; list = PatternLoader.loadFromURL(url);
+ gui.patternPanel.setPatterns(list);
+} catch (IOException ioe) {}
+</pre><p>
+and add an import statement to import the exception <code class="code">IOException</code> and the class <code class="code">List</code> into <code class="code">GuiLife</code>.</p></li><li class="listitem"><p> Run <code class="code">GuiLife</code>. You should find that the Pattern Panel is populated with the list of pattern names available from the course website.</p></li></ol></div></div></div><div class="section" title="Control Panel"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:control"></a>Control Panel</h2></div></div></div><p>The Control Panel part of the interface shown in Figure 1 looks quite complex. The method of laying out the elements you should use is to create a vertical <code class="code">BoxLayout</code> inside the Control Panel with four elements, each element of which contains a horizontal <code class="code">BoxLayout</code>; the first, second and third inner horizontal <code class="code">BoxLayout</code> objects will contain a <code class="code">JLabel</code> object followed by a <code class="code">JSlider</code> object. The last element is a <code class="code">JLabel</code> followed by a group of three <code class="code">JRadioButton</code> objects. It's perhaps best to view this layout visually by looking back to Figure 1 and then reading the code which lays out the Control Panel as just described:
+</p><pre class="programlisting">
+//TODO: Write a suitable package statement and import statements
+public class ControlPanel extends JPanel {
+
+ private JSlider zoomSlider;
+ private JSlider stepSlider;
+ private JSlider speedSlider;
+ private JRadioButton longButton;
+ private JRadioButton arrayButton;
+ private JRadioButton agingButton;
+ 
+ private JSlider createNewSlider(int min, int max, int start, String s) {
+  Box panel = Box.createHorizontalBox();
+  add(panel);
+  panel.add(new JLabel(s));
+  JSlider slider = new JSlider(min,max,start);
+  panel.add(slider);
+  return slider;
+ }
+
+ private JRadioButton createNewButton(String s, ButtonGroup g, Box b) {
+  //TODO: create a new instance of JRadioButton with text "s"
+  //TODO: add the new instance to the ButtonGroup referenced by "g"
+  //TODO: add the new instance to Box "b"
+  //TODO: return a reference to the new instance
+ }
+
+</pre><p>
+</p><pre class="programlisting">
+ public ControlPanel() {
+  super();
+  setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+
+  zoomSlider = createNewSlider(1,20,1,Strings.CONTROL_ZOOM);
+  add(Box.createVerticalStrut(10)); //add 10px of extra space
+  stepSlider = createNewSlider(0,10,0,Strings.CONTROL_STEP); 
+  add(Box.createVerticalStrut(10)); //add 10px of extra space
+  speedSlider = createNewSlider(0,100,0,Strings.CONTROL_SPEED);
+  add(Box.createVerticalStrut(10)); //add 10px of extra space
+  
+  Box worldPanel = Box.createHorizontalBox();
+  add(worldPanel);
+  worldPanel.add(new JLabel(Strings.STORAGE_WORLD_TYPE));
+  ButtonGroup group = new ButtonGroup();
+  longButton = createNewButton(Strings.STORAGE_LONG,group,worldPanel);
+  arrayButton = createNewButton(Strings.STORAGE_ARRAY,group,worldPanel);
+  agingButton = createNewButton(Strings.STORAGE_AGING,group,worldPanel);
+  arrayButton.setSelected(true);
+  add(Box.createVerticalStrut(10)); //add 10px of extra space
+ } 
+
+ public World initialiseWorld(Pattern p) throws PatternFormatException {
+  World result = null;
+  if (longButton.isSelected()) {
+   result = new PackedWorld();
+  } else if (arrayButton.isSelected()) {
+   result = new ArrayWorld(p.getWidth(),p.getHeight());
+  } else if (agingButton.isSelected()) {
+   result = new AgingWorld(p.getWidth(),p.getHeight());
+  }
+  if (result != null)  p.initialise(result);
+  return result;
+ }
+}
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="18" type="1"><li class="listitem"><p> Place the code above for <code class="code">ControlPanel</code> inside a suitable class and package structure.</p></li><li class="listitem"><p> Complete the items marked <code class="code">TODO</code> in <code class="code">ControlPanel</code>.</p></li><li class="listitem"><p> Create seven new entries inside your <code class="code">Strings</code> class to provide textual data for the Java <code class="code">String</code> literals used in the <code class="code">ControlPanel</code>. The <code class="code">String</code> literals should be <code class="code">"Zoom"</code>, <code class="code">"Step"</code>, <code class="code">"Speed"</code>, <code class="code">"World type"</code>, <code class="code">"Long"</code>, <code class="code">"Array"</code>, and <code class="code">"Aging"</code>.</p></li><li class="listitem"><p> Create a new field called <code class="code">controlPanel</code> of type <code class="code">ControlPanel</code> inside the class <code class="code">GuiLife</code>.</p></li><li class="listitem"><p> Update your implementation of the method <code class="code">createControlPanel</code> inside <code class="code">GuiLife</code> to create a new instance of <code class="code">ControlPanel</code> instead of <code class="code">JPanel</code>. Your implementation should ensure that the field called <code class="code">controlPanel</code> you created in the previous step references the new instance you create in this method.</p></li><li class="listitem"><p> Run <code class="code">GuiLife</code>. You should find that the Control Panel now displays the labels, sliders and radio buttons as shown in Figure 1.</p></li></ol></div></div></div><div class="section" title="Game Panel"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:main"></a>Game Panel</h2></div></div></div><p>The Game Panel should display the state of the game board. The code for the Game Panel is:
+</p><pre class="programlisting">
+//TODO: Write a suitable package statement and import statements
+public class GamePanel extends JPanel {
+
+ private int zoom = 10; //Number of pixels used to represent a cell
+ private int width = 1; //Width of game board in pixels
+ private int height = 1;//Height of game board in pixels
+ private World current = null;
+
+ public Dimension getPreferredSize() {
+  return new Dimension(width, height);
+ }
+
+ protected void paintComponent(Graphics g) {
+  if (current == null) return;
+  g.setColor(java.awt.Color.WHITE);
+  g.fillRect(0, 0, width, height);
+  current.draw(g, width, height);
+  if (zoom &gt; 4) {
+   g.setColor(java.awt.Color.LIGHT_GRAY);
+   //TODO: Using for loops call the drawLine method on "g", 
+   //      repeatedly to draw a grid of grey lines to delimit
+   //      the border of the cells in the game board
+  }
+ }
+
+ private void computeSize() {
+  if (current == null)  return;
+  int newWidth = current.getWidth() * zoom;
+  int newHeight = current.getHeight() * zoom;
+  if (newWidth != width || newHeight != height) {
+   width = newWidth;
+   height = newHeight;
+   revalidate(); //trigger the GamePanel to re-layout its components
+  }
+ }
+
+ public void display(World w) {
+  current = w;
+  computeSize();
+  repaint();
+ }
+}
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="24" type="1"><li class="listitem"><p> Place the code above for <code class="code">GamePanel</code> inside a suitable class and package structure.</p></li><li class="listitem"><p> Complete the items marked <code class="code">TODO</code> in <code class="code">GamePanel</code>. Remember to look at Figure 1 to see how the gray borders between the cells in the game board should be drawn.</p></li><li class="listitem"><p> Create a new field called <code class="code">gamePanel</code> of type <code class="code">GamePanel</code> inside the class <code class="code">GuiLife</code>.</p></li></ol></div></div><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="27" type="1"><li class="listitem"><p> Update your implementation of the method <code class="code">createGamePanel</code> inside <code class="code">GuiLife</code> to create a new instance of <code class="code">GamePanel</code> instead of <code class="code">JPanel</code>. Your implementation should ensure that the field called <code class="code">gamePanel</code> you created in the previous step references the new instance you create in this method.</p></li><li class="listitem"><p> Add the following two lines of code immediately after the call to <code class="code">gui.patternPanel.setPatterns</code> in the <code class="code">main</code> method of <code class="code">GuiLife</code>
+</p><pre class="programlisting">
+World w = gui.controlPanel.initialiseWorld(list.get(0));
+gui.gamePanel.display(w);
+</pre><p>
+The first line of code above may throw an instance of <code class="code">PatternFormatException</code>. You should write an additional <code class="code">catch</code> block to handle this type of exception and print a suitable error message.</p></li><li class="listitem"><p> Run <code class="code">GuiLife</code>. You should find that the Game Panel now contains a graphical depiction of a "Glider" by Richard Guy.</p></li><li class="listitem"><p> Modify your program so that it displays the second pattern available from the website, called "Blinkers" by Horton Conway.</p></li></ol></div></div></div><div class="section" title="Graphical world (Optional)"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:show%20world"></a>Graphical world (Optional)</h2></div></div></div><p>The work described in this section is optional; you may skip the work described here and proceed directly to the last section of the Workbook. In the previous sections, you have displayed all the widgets needed to support a graphical interface for the Game of Life. Unfortunately none of the widgets actually do anything! For example, changing the zoom slider does not actually change the zoom level of the Game Panel. Next week we will investigate how to support <em class="firstterm">event handlers</em> in Java to update parts of the program in response for user input and make the graphical interface fully functional.</p><p>This week you will finish your implementation by adapting code from the <code class="code">main</code> method you wrote for <code class="code">RefactorLife</code> last week. The code you wrote last week parsed options, a URL or file, and an integer the user provided to the program on the command line. Many of you produced a somewhat lengthy and messy implementation! A better solution is to create a new class to store the pertinent details provided by the user on the command line. Here is a skeleton structure of such a class:
+</p><pre class="programlisting">
+package uk.ac.cam.your-crsid.tick6;
+
+public class CommandLineOptions {
+
+ public static String WORLD_TYPE_LONG = "--long";
+ public static String WORLD_TYPE_AGING = "--aging";
+ public static String WORLD_TYPE_ARRAY = "--array";
+ private String worldType = null;
+ private Integer index = null;
+ private String source = null;
+ 
+ public CommandLineOptions(String[] args) throws CommandLineException {
+  //TODO: parse "args" to update the private fields "worldType", 
+  //      "index" and "source" with the correct values, if any.
+ }
+ public String getWorldType() {return worldType;}
+ public Integer getIndex() {return index;}
+ public String getSource() {return source;}
+}
+</pre><p>
+</p><p>Notice that the constructor for <code class="code">CommandLineOptions</code> may throw an exception of type <code class="code">CommandLineException</code>, which you should define as follows:
+</p><pre class="programlisting">
+package uk.ac.cam.your-crsid.tick6;
+public class CommandLineException extends Exception {
+	public CommandLineException(String message) {
+		super(message);
+	}
+}
+</pre><p>
+In the constructor of <code class="code">CommandLineException</code> you should pass in a message of type <code class="code">String</code>. Since <code class="code">CommandLineException</code> inherits from <code class="code">Exception</code> you can retrieve the message using the <code class="code">getMessage</code> method on <code class="code">CommandLineException</code>. You will find the following implementation of <code class="code">TextLife</code> helpful in writing and testing your implementation of <code class="code">CommandLineOptions</code>:
+</p><pre class="programlisting">
+//TODO: Write a suitable package statement and import statements
+public class TextLife {
+
+	public static void main(String[] args) {
+		CommandLineOptions c = new CommandLineOptions(args);
+		List&lt;Pattern&gt; list;
+		if (c.getSource().startsWith("http://"))
+			list = PatternLoader.loadFromURL(c.getSource());
+		else
+			list = PatternLoader.loadFromDisk(c.getSource());
+		if (c.getIndex() == null) {
+			int i = 0;
+			for (Pattern p : list)
+				System.out.println((i++)+" "+p.getName()+" "+p.getAuthor());
+		} else {
+			Pattern p = list.get(c.getIndex());
+			World w = null;
+			if (c.getWorldType().equals(CommandLineOptions.WORLD_TYPE_AGING)) {
+				w = new AgingWorld(p.getWidth(), p.getHeight());
+			} else if (c.getWorldType().equals(CommandLineOptions.WORLD_TYPE_ARRAY)) {
+				w = new ArrayWorld(p.getWidth(), p.getHeight());
+			} else {
+				w = new PackedWorld();
+			}
+			p.initialise(w);
+			int userResponse = 0;
+			while (userResponse != 'q') {
+				w.print(new OutputStreamWriter(System.out));
+				try {
+					userResponse = System.in.read();
+				} catch (IOException e) {}
+				w = w.nextGeneration(0);
+			}
+		}
+	}
+}
+</pre><p>
+</p><p>The class <code class="code">TextLife</code> uses many of the classes you wrote in previous weeks; you should have already copied across the relevant classes to successfully complete previous exercises found in this workbook. You should use the class <code class="code">TextLife</code> above to help you test your implementation of <code class="code">CommandLineOptions</code>. For example, <code class="code">TextLife</code> should function as shown in the following examples:
+</p><pre class="programlisting">
+crsid@machine:~&gt; java -cp world.jar:. uk/ac/cam/your-crsid/tick6/TextLife
+Error: No arguments found
+crsid@machine:~&gt; java -cp world.jar:. uk/ac/cam/your-crsid/tick6/TextLife \
+http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt | head -n 2
+0 Glider Richard Guy 1970
+1 Blinkers Horton Conway 1970
+crsid@machine:~&gt; java -cp world.jar:. uk/ac/cam/your-crsid/tick6/TextLife \
+http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt -3
+Error: Index out of bounds
+crsid@machine:~&gt; java -cp world.jar:. uk/ac/cam/your-crsid/tick6/TextLife \
+--long http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt | head -n 2
+0 Glider Richard Guy 1970
+1 Blinkers Horton Conway 1970
+crsid@machine:~&gt; java -cp world.jar:. uk/ac/cam/your-crsid/tick6/TextLife \
+http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt 0
+-
+________
+___#____
+_#_#____
+__##____
+________
+________
+________
+________
+q
+crsid@machine:~&gt; java -cp world.jar:. uk/ac/cam/your-crsid/tick6/TextLife \
+--aging http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt 0
+________
+___#____
+_#_#____
+__##____
+________
+________
+________
+________
+-
+________
+__#1____
+_1_##___
+__##____
+________
+________
+________
+________
+
+</pre><p>
+</p><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="31" type="1"><li class="listitem"><p> Write an implementation of <code class="code">CommandLineOptions</code> which parses the command line options in the same way as your implementation of <code class="code">RefactorLife</code> did last week.</p></li><li class="listitem"><p> Adapt the definition of <code class="code">TextLife</code> as shown above so that, when combined with your implementation of <code class="code">CommandLineOptions</code>, it produces the same output as shown in the test cases shown above. Hint: You will need to catch and handle several exceptions which are thrown by methods used in <code class="code">TextLife</code>; they aren't currently caught so try compiling <code class="code">TextLife</code> as is to see which exceptions must be caught. To handle the errors, you might like to print out the messages associated with the exception using the method <code class="code">getMessage</code>.</p></li></ol></div></div><div class="sidebar"><p class="title"><b></b></p><div class="orderedlist"><ol class="orderedlist" start="33" type="1"><li class="listitem"><p> Update your implementation of <code class="code">GuiLife</code> to use the implementation of <code class="code">CommandLineOptions</code> to interpret the options provided to the program on the command line. If the options provided are incorrect, an error message should be printed out and the program should terminate; if the options are well formatted and a specific starting pattern is specified, then the graphical interface should load with the Game Panel configured with the specified pattern.</p></li></ol></div></div></div><div class="section" title="Tick 6"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec:tick6"></a>Tick 6</h2></div></div></div><p>To complete your tick you need to prepare a jar file with the contents of all the classes you have written in this workbook and email it to <code class="code">ticks1a-java@cl.cam.ac.uk</code>. Your jar file should contain:
+</p><pre class="programlisting">
+uk/ac/cam/your-crsid/tick6/HelloSwingWorld.java
+uk/ac/cam/your-crsid/tick6/HelloSwingWorld.class
+uk/ac/cam/your-crsid/tick6/CommandLineOptions.java  &lt;-- optional
+uk/ac/cam/your-crsid/tick6/CommandLineOptions.class &lt;-- optional
+uk/ac/cam/your-crsid/tick6/TextLife.java            &lt;-- optional
+uk/ac/cam/your-crsid/tick6/TextLife.class           &lt;-- optional
+uk/ac/cam/your-crsid/tick6/GuiLife.java
+uk/ac/cam/your-crsid/tick6/GuiLife.class
+uk/ac/cam/your-crsid/tick6/GamePanel.java
+uk/ac/cam/your-crsid/tick6/GamePanel.class
+uk/ac/cam/your-crsid/tick6/Strings.java
+uk/ac/cam/your-crsid/tick6/Strings.class
+uk/ac/cam/your-crsid/tick6/ControlPanel.java
+uk/ac/cam/your-crsid/tick6/ControlPanel.class
+uk/ac/cam/your-crsid/tick6/PatternPanel.java
+uk/ac/cam/your-crsid/tick6/PatternPanel.class
+uk/ac/cam/your-crsid/tick6/SourcePanel.java
+uk/ac/cam/your-crsid/tick6/SourcePanel.class
+uk/ac/cam/your-crsid/tick6/WorldImpl.java
+uk/ac/cam/your-crsid/tick6/WorldImpl.class
+uk/ac/cam/your-crsid/tick6/ArrayWorld.java
+uk/ac/cam/your-crsid/tick6/ArrayWorld.class
+uk/ac/cam/your-crsid/tick6/PackedWorld.java
+uk/ac/cam/your-crsid/tick6/PackedWorld.class
+uk/ac/cam/your-crsid/tick6/AgingWorld.java
+uk/ac/cam/your-crsid/tick6/AgingWorld.class
+uk/ac/cam/your-crsid/tick6/Pattern.java
+uk/ac/cam/your-crsid/tick6/Pattern.class
+uk/ac/cam/your-crsid/tick6/PackedLong.java
+uk/ac/cam/your-crsid/tick6/PackedLong.class
+uk/ac/cam/your-crsid/tick6/PatternLoader.java
+uk/ac/cam/your-crsid/tick6/PatternLoader.class
+uk/ac/cam/your-crsid/tick6/PatternFormatException.java
+uk/ac/cam/your-crsid/tick6/PatternFormatException.class
+</pre><p>
+</p><p>If you completed the optional work, you should be able to run your program in one of three ways:
+</p><div class="itemizedlist"><ul class="itemizedlist" type="disc" compact><li class="listitem"><p><code class="code">java -cp world.jar:crsid-tick6.jar \<br>
+uk.ac.cam.your-crsid.tick6.TextLife [url/file]</code></p></li><li class="listitem"><p><code class="code">java -cp world.jar:crsid-tick6.jar \<br>
+uk.ac.cam.your-crsid.tick6.TextLife [url/file] [index]</code></p></li><li class="listitem"><p><code class="code">java -cp world.jar:crsid-tick6.jar \<br>
+uk.ac.cam.your-crsid.tick6.TextLife [worldType] [url/file] [index]</code></p></li></ul></div><p>
+</p></div></div><p class="docfooter">Copyright 2008-2012 Alastair R. Beresford and Andrew C. Rice</p></body></html>
