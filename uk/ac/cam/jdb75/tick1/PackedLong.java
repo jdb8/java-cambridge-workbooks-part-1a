@@ -1,4 +1,4 @@
-package uk.ac.cam.jdb75.tick1
+package uk.ac.cam.jdb75.tick1;
 
 public class PackedLong {
 	/*
@@ -8,7 +8,7 @@ public class PackedLong {
 	 */
 	public static boolean get(long packed, int position) {
 		// set "check" to equal 1 if the "position" bit in "packed" is set to 1
-		long check = (1<<position & packed) >> position;
+		long check = 1L & (packed>>position);
 
 		return (check == 1);
 	}
@@ -20,12 +20,13 @@ public class PackedLong {
 	public static long set(long packed, int position, boolean value) {
 		if(value) {
 			// update the value "packed" with the bit at "position" set to 1
-			packed | 1<<position;
+			packed = packed | (1L<<position);
 		}
 		else {
 			// update the value "packed" with the bit at "position" set to 0
-			
+			packed = packed & ~(1L<<position);		
 		}
+		return packed;
 	}
 	 
 }
