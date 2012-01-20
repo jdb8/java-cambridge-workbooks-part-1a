@@ -1,4 +1,4 @@
-1. 
+1. int a = 4000; int b = 2; int c = 1; System.out.println(c + (a=b)); Returns 3, as a=b returns b.
 2. Outputs 10 9. The output operator is after the variable name therefore the value returned is the value before the variable was decreased by --. The 9 is then output by the second println as the variable has changed.
 3. Prints out 9 9, since the output operator is now before the variable name meaning the new variable is returned in the first println.
 4.i x = 4
