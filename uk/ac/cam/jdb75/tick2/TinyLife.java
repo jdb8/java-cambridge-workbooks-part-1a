@@ -3,15 +3,15 @@ package uk.ac.cam.jdb75.tick2;
 public class TinyLife {
 	public static void main(String[] args) {
 		long world = 0x20A0600000000000L;
-		System.out.println(countNeighbours(world, 6, 6));
+		System.out.println(computeCell(world, 4, 6));
 	}
 
 	public static boolean getCell(long world, int col, int row) {
-		return (col > 7 | row > 7 | col < 0 | row < 0) ? false : PackedLong.get(world, (col + 8*row));
+		return (col > 7 || row > 7 || col < 0 || row < 0) ? false : PackedLong.get(world, (col + 8*row));
 	}
 
 	public static long setCell(long world, int col, int row, boolean value) {
-		return (col > 7 | row > 7 | col < 0 | row < 0) ? world : PackedLong.set(world, (col + 8*row), value);
+		return (col > 7 || row > 7 || col < 0 || row < 0) ? world : PackedLong.set(world, (col + 8*row), value);
 	}
 
 	public static void print(long world) {
@@ -28,6 +28,7 @@ public class TinyLife {
 	public static int countNeighbours(long world, int col, int row) {
 		int neighbours = 0;
 		
+		// increase neighbours by 1 if getCell is true for each adjacent square 
 		neighbours += (getCell(world, col-1, row-1)) ? 1 : 0;
 		neighbours += (getCell(world, col, row-1)) ? 1 : 0;
 		neighbours += (getCell(world, col+1, row-1)) ? 1 : 0;
@@ -36,22 +37,43 @@ public class TinyLife {
 		neighbours += (getCell(world, col-1, row+1)) ? 1 : 0;
 		neighbours += (getCell(world, col, row+1)) ? 1 : 0;
 		neighbours += (getCell(world, col+1, row+1)) ? 1 : 0;
-		 	
-		// for (int c = -1; c <= 1; c++) {
-		// 	for (int r = -1; r <= 1; r++) {
-
-		// 		neighbours += (getCell(world, col, r+row)) ? 1 : 0; 
-		// 		System.out.println("checked " + col + " " + (r+row));
-		// 	}
-		// 	neighbours += (getCell(world, c+col, row)) ? 1 : 0; 
-		// 	System.out.println("checked " + (c+col) + " " + row);
-		// }
 
 		return neighbours;
 	}
 
 	public static boolean computeCell(long world, int col, int row) {
-		return true;
+
+		// liveCell is true if the cell at position (col,row) in world is live
+ 		boolean liveCell = getCell(world, col, row);
+
+ 		// neighbours is the number of live neighbours to cell (col,row)
+ 		int neighbours = countNeighbours(world, col, row);
+
+ 		// we will return this value at the end of the method to indicate whether 
+ 		// cell (col,row) should be live in the next generation
+ 		boolean nextCell = false;
+	
+ 		//A live cell with less than two neighbours dies (underpopulation)
+ 		if (neighbours < 2) {
+ 			nextCell = false;
+		}
+ 
+ 		//A live cell with two or three neighbours lives (a balanced population)
+ 		if (liveCell && neighbours == 2 || liveCell && neighbours == 3) {
+ 			nextCell = true;
+ 		}
+
+ 		//A live cell with with more than three neighbours dies (overcrowding)
+ 		if (neighbours > 3) {
+ 			nextCell = false;
+ 		}
+
+ 		//A dead cell with exactly three live neighbours comes alive
+ 		if (!liveCell && neighbours == 3) {
+ 			nextCell = true;
+ 		}
+	
+ 		return nextCell;
 	}
 
 	public static long nextGeneration(long world) {
