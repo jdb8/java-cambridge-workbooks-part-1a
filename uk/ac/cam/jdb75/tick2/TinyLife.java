@@ -1,9 +1,8 @@
 package uk.ac.cam.jdb75.tick2;
 
 public class TinyLife {
-	public static void main(String[] args) {
-		long world = 0x20A0600000000000L;
-		System.out.println(computeCell(world, 4, 6));
+	public static void main(String[] args) throws Exception {
+ 		play(Long.decode(args[0]));
 	}
 
 	public static boolean getCell(long world, int col, int row) {
@@ -22,7 +21,6 @@ public class TinyLife {
 			}
 			System.out.println();
 		}
-
 	}
 
 	public static int countNeighbours(long world, int col, int row) {
@@ -77,6 +75,21 @@ public class TinyLife {
 	}
 
 	public static long nextGeneration(long world) {
-		return 1L;
+		long newWorld = 0L;
+		for (int row = 0; row < 8; row++) {
+			for (int col = 0; col < 8; col++) {
+				newWorld = setCell(newWorld, col, row, computeCell(world, col, row));
+			}
+		}
+		return newWorld;
+	}
+
+	public static void play(long world) throws Exception {
+ 		int userResponse = 0;
+ 		while (userResponse != 'q') {
+  			print(world);
+  			userResponse = System.in.read();
+  			world = nextGeneration(world);
+ 		}
 	}
 }
