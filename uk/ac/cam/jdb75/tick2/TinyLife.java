@@ -26,12 +26,26 @@ public class TinyLife {
 	}
 
 	public static int countNeighbours(long world, int col, int row) {
-		int neighbours = 0; 	
-		for (int c = -1; c <= 1; c++) {
-			System.out.println(col+c);
-			//neighbours += (getCell(world, col, row)) ? 1 : 0; 
-			//System.out.println("checked " + col + " " + row);
-		}
+		int neighbours = 0;
+		
+		neighbours += (getCell(world, col-1, row-1)) ? 1 : 0;
+		neighbours += (getCell(world, col, row-1)) ? 1 : 0;
+		neighbours += (getCell(world, col+1, row-1)) ? 1 : 0;
+		neighbours += (getCell(world, col-1, row)) ? 1 : 0;
+		neighbours += (getCell(world, col+1, row)) ? 1 : 0;
+		neighbours += (getCell(world, col-1, row+1)) ? 1 : 0;
+		neighbours += (getCell(world, col, row+1)) ? 1 : 0;
+		neighbours += (getCell(world, col+1, row+1)) ? 1 : 0;
+		 	
+		// for (int c = -1; c <= 1; c++) {
+		// 	for (int r = -1; r <= 1; r++) {
+
+		// 		neighbours += (getCell(world, col, r+row)) ? 1 : 0; 
+		// 		System.out.println("checked " + col + " " + (r+row));
+		// 	}
+		// 	neighbours += (getCell(world, c+col, row)) ? 1 : 0; 
+		// 	System.out.println("checked " + (c+col) + " " + row);
+		// }
 
 		return neighbours;
 	}
