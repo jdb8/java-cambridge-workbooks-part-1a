@@ -1,0 +1,6 @@
+1. i = col + 8*row;
+2. col = i % 8;
+3. row = i/8;
+4. 6th bit is 1
+5. (4,2) = 20th bit = 0
+
