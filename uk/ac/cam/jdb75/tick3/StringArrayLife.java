@@ -7,7 +7,7 @@ public class StringArrayLife {
         String formatString = args[0];
         String[] argArray = formatString.split(":");
 
-        //TODO: Determine the dimensions of the game board
+        //Determine the dimensions of the game board
         int width = Integer.parseInt(argArray[2]);
         int height = Integer.parseInt(argArray[3]);
         boolean[][] world = new boolean[height][width];
@@ -16,22 +16,22 @@ public class StringArrayLife {
         int startcol = Integer.parseInt(argArray[4]);
         int startrow = Integer.parseInt(argArray[5]);
 
+        // Parse CELLS
         String[] cells = argArray[6].split(" ");
-         
-        for (int i = 0; i<cells.length; i++) {
-            System.out.println(cells[i]);             
+
+        // Using loops, update the appropriate cells of "world"
+        //      to "true" 
+
+        for (int row = 0; row<cells.length; row++) {
+            char[] chars = cells[row].toCharArray();
+            for (int col = 0; col<chars.length; col++) {
+                if (chars[col] == '1') {
+                    setCell(world, (col+startcol), (row+startrow), true);
+                }    
+            }
         }
 
-        //TODO: Using loops, update the appropriate cells of "world"
-        //      to "true"
-        for (int row = 0; row<height; row++) {
-            for (int col = 0; col<width; col++) {
-                // need to work out what to put here        
-            }
-        }    
-
-
-        //play(world);
+        play(world);
     }
 
     public static boolean getCell(boolean[][] world, int col, int row) {
