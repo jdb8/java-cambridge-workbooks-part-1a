@@ -18,3 +18,5 @@
 
 2. Code copied into main method.
 3. Output will be 0, 2, 2, 1, due to the same piece of memory being updated each time (and in the first case, the post increment operator returns the old value).
+4. Function updated.
+

@@ -11,10 +11,6 @@ public class ArrayLife {
                 world[i+size/2-4][j+size/2-4] = PackedLong.get(initial,i*8+j);
             }
         }        
-        System.out.println(getCell(world,4,3));
-        System.out.println(countNeighbours(world,4,3));
-        System.out.println(computeCell(world,4,3));
-        //nextGeneration(world);
         play(world);
 
     }
@@ -25,14 +21,13 @@ public class ArrayLife {
 
     public static void setCell(boolean[][] world, int col, int row, boolean value) {
         if (row < 0 || row > world.length - 1 || col < 0 || col > world[row].length - 1) {} 
-        else { world[row][col] = value; /*System.out.println(row + " , " + col + " is now " + value);*/ }
+        else { world[row][col] = value; }
     }
 
     public static void print(boolean[][] world) {
         System.out.println("-");
         for (int row = 0; row < world.length; row++) {
             for (int col = 0; col < world[row].length; col++) {
-                //System.out.print(getCell(world, col, row) ? col + "," + row + " # " : col + "," + row + " _ ");
                 System.out.print(getCell(world, col, row) ? "#" : "_");
             }
             System.out.println();
@@ -52,8 +47,6 @@ public class ArrayLife {
         neighbours += (getCell(world, col, row+1)) ? 1 : 0;
         neighbours += (getCell(world, col+1, row+1)) ? 1 : 0;
 
-        //System.out.println(row + " , " + col + " - " + neighbours);
-            
         return neighbours;
     }
 
@@ -99,7 +92,6 @@ public class ArrayLife {
             newWorld[row] = new boolean[world[row].length];
             for (int col = 0; col < world[row].length; col++) {
                 setCell(newWorld, col, row, computeCell(world, col, row));
-                //System.out.println("set cell" + row + col + " to " + computeCell(world, col, row));
             }
         }
         return newWorld;
