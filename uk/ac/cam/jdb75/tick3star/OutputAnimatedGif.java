@@ -21,7 +21,19 @@ public class OutputAnimatedGif {
     }
 
     private BufferedImage makeFrame(boolean[][] world) {
-        //TODO: complete this method
+        int w = world[0].length; // assuming a rectangular or square board - no weird shapes!
+        int h = world.length;
+        int cellSize = 10; // size of each cell square
+
+        BufferedImage image = new BufferedImage(w*cellSize, h*cellSize, BufferedImage.TYPE_INT_RGB);
+
+        Graphics g = image.getGraphics(); //create a new graphics context
+        g.setColor(Color.black);
+        g.drawRect(20, 20, 10, 10);
+
+        g.dispose(); // free up resources used by the graphics context
+
+        return image;
     }
     
     public void addFrame(boolean[][] world) throws IOException {
@@ -58,5 +70,21 @@ public class OutputAnimatedGif {
 
     public void close() throws IOException {
         writer.endWriteSequence();
+    }
+
+    public static void main(String[] args) throws IOException {
+        
+    }
+
+    public void test() throws IOException {
+        new OutputAnimatedGif("test.gif");
+
+        //temporary testing code
+        //Pattern p = new Pattern(args[0]);
+        boolean[][] world = new boolean[80][80];
+        makeFrame(world);
+        addFrame(world);
+        close();
+        //p.initialise(world);
     }
 }
