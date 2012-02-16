@@ -15,9 +15,9 @@ public class TestArrayWorld implements World {
     public TestArrayWorld(int w, int h) {
         width = w;
         height = h;
-        // TODO: set generation equal to zero
+        // set generation equal to zero
         generation = 0;
-        // TODO: set cells to reference a new rectangular two-dimensional 
+        // set cells to reference a new rectangular two-dimensional 
         //       boolean array of size height by width
         cells = new boolean[getHeight()][getWidth()];  
     }
@@ -25,9 +25,9 @@ public class TestArrayWorld implements World {
     protected TestArrayWorld(TestArrayWorld prev) {
         width = prev.width;
         height = prev.height;
-        // TODO: set generation equal to prev.generation+1
+        // set generation equal to prev.generation+1
         generation = prev.generation+1;
-        // TODO: set cells to reference a new rectangular two-dimensional 
+        // set cells to reference a new rectangular two-dimensional 
         //       boolean array of size height by width
         cells = new boolean[getHeight()][getWidth()];  
     }
@@ -67,7 +67,7 @@ public class TestArrayWorld implements World {
     private TestArrayWorld nextGeneration() {
         //Construct a new TestArrayWorld object to hold the next generation:
         TestArrayWorld world = new TestArrayWorld(this);
-        //TODO: Use for loops with "setCell" and "computeCell" to populate "world"
+        // Use for loops with "setCell" and "computeCell" to populate "world"
         for (int row = 0; row < world.getHeight(); row++) {
             for (int col = 0; col < world.getWidth(); col++) {
                 world.setCell(col, row, computeCell(col, row));
@@ -78,15 +78,15 @@ public class TestArrayWorld implements World {
 
     public World nextGeneration(int log2StepSize)  { 
         TestArrayWorld world = this;
-        //TODO: repeat the statement in curly brackets 2^log2StepSize times
+        // repeat the statement in curly brackets 2^log2StepSize times
         int times = 1 << log2StepSize;
         for (int i = 0; i < times; i++) {
-        world = world.nextGeneration();
+            world = world.nextGeneration();
         }
         return world;
     }
 
-    //TODO: Add any other private methods which you find helpful
+    // Add any other private methods which you find helpful
     
     private int countNeighbours(int col, int row) {
         int neighbours = 0;
