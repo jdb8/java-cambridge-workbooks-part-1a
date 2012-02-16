@@ -24,7 +24,8 @@ public class RefactorLife {
             } else {
                 int chosen = Integer.parseInt(args[1]);
                 Pattern p = ps.get(chosen);
-                World world = new TestArrayWorld(p.getHeight(), p.getWidth());
+                //World world = new TestArrayWorld(p.getHeight(), p.getWidth());
+                World world = new TestPackedWorld();
                 p.initialise(world);
                 play(world);
             }    
