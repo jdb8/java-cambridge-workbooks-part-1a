@@ -27,10 +27,12 @@ public class Repeat {
     public static String parseAndRep(String[] args) {
         try {
             int rep = Integer.parseInt(args[1]);
+            if (rep <= 0) {throw new NumberFormatException();}
             String store = "";
-            for (int i = 0; i < rep; i++) {
-                store += args[0] + " ";
+            for (int i = 0; i < rep - 1; i++) { // minus one in order to get rid of trailing space
+                store += args[0] + " "; 
             }
+            store += args[0]; // final word is appended here
             return store;        
         }
         catch (ArrayIndexOutOfBoundsException a) {
