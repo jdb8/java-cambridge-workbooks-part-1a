@@ -1,4 +1,4 @@
-package uk.ac.cam.jdb75.tick3;
+package uk.ac.cam.jdb75.tick3star;
 
 public class Pattern {
 
