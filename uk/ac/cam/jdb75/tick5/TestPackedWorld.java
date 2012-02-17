@@ -37,7 +37,7 @@ public class TestPackedWorld implements World {
         return (col > 7 || row > 7 || col < 0 || row < 0) ? false : PackedLong.get(cells, (col + 8*row));
     }
     public void setCell(int col, int row, boolean alive) { 
-        if (col > 7 || row > 7 || col < 0 || row < 0) { } else { PackedLong.set(cells, (col + 8*row), alive); };
+        if (col > 7 || row > 7 || col < 0 || row < 0) { } else { cells = PackedLong.set(cells, (col + 8*row), alive); };
     }
     public int getWidth()  { 
         return this.width;
@@ -74,7 +74,7 @@ public class TestPackedWorld implements World {
         return world;
     }
 
-    public World nextGeneration(int log2StepSize)  { 
+    public TestPackedWorld nextGeneration(int log2StepSize)  { 
         TestPackedWorld world = this;
         // repeat the statement in curly brackets 2^log2StepSize times
         int times = 1 << log2StepSize;
