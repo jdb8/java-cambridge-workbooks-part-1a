@@ -46,8 +46,8 @@ public class RefactorLife {
 
     public static void play(World world) throws IOException {
         int userResponse = 0;
-        while (userResponse != 'q') {
-            Writer w = new OutputStreamWriter(System.out);
+        while (userResponse != 'q') { // this loop doesn't work properly in Windows, prints patterns twice
+            Writer w = new OutputStreamWriter(System.out);            
             world.print(w);
             userResponse = System.in.read();
             world = world.nextGeneration(0);
