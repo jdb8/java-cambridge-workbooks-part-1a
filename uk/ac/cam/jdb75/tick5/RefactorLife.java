@@ -1,6 +1,7 @@
 package uk.ac.cam.jdb75.tick5;
 
 import uk.ac.cam.acr31.life.World;
+import uk.ac.cam.acr31.life.WorldViewer;
 import java.util.List;
 import java.io.IOException;
 import java.io.Writer;
@@ -61,9 +62,11 @@ public class RefactorLife {
 
     public static void play(World world) throws IOException {
         int userResponse = 0;
+        WorldViewer viewer = new WorldViewer();
         while (userResponse != 'q') { // this loop doesn't work properly in Windows, prints patterns twice
             Writer w = new OutputStreamWriter(System.out);            
             world.print(w);
+            viewer.show(world);
             userResponse = System.in.read();
             world = world.nextGeneration(0);
         }
