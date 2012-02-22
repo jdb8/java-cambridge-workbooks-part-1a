@@ -8,13 +8,22 @@ import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 
 public class RefactorLife {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         try {
-            String filename = args[0];
+            // valid arguments in the form --array http://... 42
+            //   or --long http://... 42
+            //   or http://... 42 
+            //   or http://...
+            int argsLength = args.length;
+            String worldType = argsLength == 3 ? args[0] : "--array"; 
+            String filename = argsLength == 3 ? args[1] : args[0];
             List<Pattern> ps = filename.startsWith("http://") ? PatternLoader.loadFromURL(filename) : PatternLoader.loadFromDisk(filename);
-            if (ps.isEmpty()) {throw new PatternFormatException("Error: no valid patterns found in file");}
-                
-            if (args.length < 2) {
+            if (ps.isEmpty()) {
+                System.out.println("Error: no valid patterns found in file");
+                return;
+            }           
+            
+            if (args.length == 1) {
                 int i = 0;
                 for (Pattern p: ps) {
                     // use the public methods of Pattern to retrieve the data to print (as well as converting ints)
@@ -22,18 +31,25 @@ public class RefactorLife {
                     i++;
                 }
             } else {
-                int chosen = Integer.parseInt(args[1]);
+                int chosen = argsLength == 3 ? Integer.parseInt(args[2]) : Integer.parseInt(args[1]);
                 Pattern p = ps.get(chosen);
-                //World world = new TestArrayWorld(p.getHeight(), p.getWidth());
-                World world = new TestPackedWorld();
+                World world = null;
+                if (worldType.equals("--array")) {
+                    world = new TestArrayWorld(p.getHeight(), p.getWidth());
+                } else if (worldType.equals("--long")) {
+                    world = new TestPackedWorld(); 
+                } else {
+                    System.out.println("Error: unknown world type supplied. First argument must be either --array or --long");
+                    return; 
+                }
                 p.initialise(world);
                 play(world);
             }    
                     
-        } catch (ArrayIndexOutOfBoundsException b) { // initial arguments insufficient
-                System.out.println("Error: must supply at least one argument");
         } catch (PatternFormatException e) {
                 System.out.println(e.getMessage());
+        } catch (ArrayIndexOutOfBoundsException b) { // initial arguments insufficient
+                System.out.println("Error: must supply at least one argument");
         } catch (NumberFormatException b) { // second argument cannot be parsed as int
                 System.out.println("Error: second argument must be an integer");
         } catch (IndexOutOfBoundsException i) { // pattern list doesn't have the chosen pattern
