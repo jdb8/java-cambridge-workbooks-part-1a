@@ -1,7 +1,11 @@
 package uk.ac.cam.jdb75.tick5;
 
 import java.awt.Color;
-//TODO: insert other appropriate "import" statements here
+import java.awt.Graphics;
+import java.io.PrintWriter;
+import java.io.Writer;
+
+import uk.ac.cam.acr31.life.World;
 
 public abstract class WorldImpl implements World {
 
@@ -58,25 +62,82 @@ public abstract class WorldImpl implements World {
         }  
     }
     
-    //TODO: Complete here in parent
     public World nextGeneration(int log2StepSize) {
         //Remember to call nextGeneration 2^log2StepSize times
+        WorldImpl world = this;
+        // repeat the statement in curly brackets 2^log2StepSize times
+        int times = 1 << log2StepSize;
+        for (int i = 0; i < times; i++) {
+            world = world.nextGeneration();
+        }
+        return world;
     }
 
-    //TODO: Complete here in parent
     public void print(Writer w) {
         //Use getCellAsString to get text representation of the cell
+        PrintWriter pw = new PrintWriter(w);
+        pw.println("-");
+        for (int row = 0; row < getHeight(); row++) {
+            for (int col = 0; col < getWidth(); col++) {
+                pw.print(getCellAsString(col, row));
+            }
+            pw.println();
+        }
+        pw.flush();
     }
     
-    //TODO: Complete here in parent
     protected int countNeighbours(int col, int row) {
         //Compute the number of live neighbours
+        int neighbours = 0;
+        
+        // increase neighbours by 1 if getCell is true for each adjacent square 
+        neighbours += (getCell(col-1, row-1)) ? 1 : 0;
+        neighbours += (getCell(col, row-1)) ? 1 : 0;
+        neighbours += (getCell(col+1, row-1)) ? 1 : 0;
+        neighbours += (getCell(col-1, row)) ? 1 : 0;
+        neighbours += (getCell(col+1, row)) ? 1 : 0;
+        neighbours += (getCell(col-1, row+1)) ? 1 : 0;
+        neighbours += (getCell(col, row+1)) ? 1 : 0;
+        neighbours += (getCell(col+1, row+1)) ? 1 : 0;
+
+        return neighbours;
     }
 
-    //TODO: Complete here in parent
     protected boolean computeCell(int col, int row) {
         //Compute whether this cell is alive or dead in the next generation
         //using "countNeighbours"
+        
+        // liveCell is true if the cell at position (col,row) in world is live
+        boolean liveCell = getCell(col, row);
+
+        // neighbours is the number of live neighbours to cell (col,row)
+        int neighbours = countNeighbours(col, row);
+
+        // we will return this value at the end of the method to indicate whether 
+        // cell (col,row) should be live in the next generation
+        boolean nextCell = false;
+    
+        //A live cell with less than two neighbours dies (underpopulation)
+        if (neighbours < 2) {
+            nextCell = false;
+        }
+ 
+        //A live cell with two or three neighbours lives (a balanced population)
+        if (liveCell && neighbours == 2 || liveCell && neighbours == 3) {
+            nextCell = true;
+        }
+
+        //A live cell with with more than three neighbours dies (overcrowding)
+        if (neighbours > 3) {
+            nextCell = false;
+        }
+
+        //A dead cell with exactly three live neighbours comes alive
+        if (!liveCell && neighbours == 3) {
+            nextCell = true;
+        }
+    
+        return nextCell;
     }
 
     // Will be implemented by child class. Return true if cell (col,row) is alive.
