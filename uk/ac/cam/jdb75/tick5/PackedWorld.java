@@ -29,7 +29,7 @@ public class PackedWorld extends WorldImpl {
                 world.setCell(col, row, computeCell(col, row));
             }
         }
-        return world;
+        return world;   
     }
 
     @Override

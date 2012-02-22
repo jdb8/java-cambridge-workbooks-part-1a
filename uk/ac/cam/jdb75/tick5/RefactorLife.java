@@ -4,7 +4,6 @@ import uk.ac.cam.acr31.life.World;
 import java.util.List;
 import java.io.IOException;
 import java.io.Writer;
-import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 
 public class RefactorLife {
@@ -15,6 +14,8 @@ public class RefactorLife {
             //   or http://... 42 
             //   or http://...
             int argsLength = args.length;
+            if (argsLength == 0) { System.out.println("Error: must supply at least one argument"); return; }
+            
             String worldType = argsLength == 3 ? args[0] : "--array"; 
             String filename = argsLength == 3 ? args[1] : args[0];
             List<Pattern> ps = filename.startsWith("http://") ? PatternLoader.loadFromURL(filename) : PatternLoader.loadFromDisk(filename);
@@ -35,9 +36,9 @@ public class RefactorLife {
                 Pattern p = ps.get(chosen);
                 World world = null;
                 if (worldType.equals("--array")) {
-                    world = new TestArrayWorld(p.getWidth(), p.getHeight());
+                    world = new ArrayWorld(p.getWidth(), p.getHeight());
                 } else if (worldType.equals("--long")) {
-                    world = new TestPackedWorld(); 
+                    world = new PackedWorld(8,8); 
                 } else {
                     System.out.println("Error: unknown world type supplied. First argument must be either --array or --long");
                     return; 
@@ -48,15 +49,13 @@ public class RefactorLife {
                     
         } catch (PatternFormatException e) {
                 System.out.println(e.getMessage());
-        } catch (ArrayIndexOutOfBoundsException b) { // initial arguments insufficient
-                System.out.println("Error: must supply at least one argument");
         } catch (NumberFormatException b) { // second argument cannot be parsed as int
-                System.out.println("Error: second argument must be an integer");
+                System.out.println("Error: you must use an integer argument to choose a pattern");
         } catch (IndexOutOfBoundsException i) { // pattern list doesn't have the chosen pattern
                 System.out.println("Error: pattern number supplied did not match any patterns loaded");
         } catch (IOException io) {
                 System.out.println("Error: a problem was encountered while reading the file");
-        }    
+        }
         
     }
 
