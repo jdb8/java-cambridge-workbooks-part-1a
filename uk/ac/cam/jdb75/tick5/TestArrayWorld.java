@@ -33,12 +33,12 @@ public class TestArrayWorld implements World {
     }
 
     public boolean getCell(int col, int row) { 
-        return (row < 0 || row > getHeight() - 1 || col < 0 || col > getWidth() - 1) ? false : cells[row][col];
+        return (row < 0 || row > getHeight() - 1 || col < 0 || col > getWidth() - 1) ? false : cells[col][row];
     }
     public void setCell(int col, int row, boolean alive) { 
         if (row < 0 || row > getHeight() - 1 || col < 0 || col > getWidth() - 1) {} 
         else { 
-            cells[row][col] = alive;
+            cells[col][row] = alive;
         }
     }
     public int getWidth()  { 

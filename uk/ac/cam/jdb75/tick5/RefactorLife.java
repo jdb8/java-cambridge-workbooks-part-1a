@@ -35,7 +35,7 @@ public class RefactorLife {
                 Pattern p = ps.get(chosen);
                 World world = null;
                 if (worldType.equals("--array")) {
-                    world = new TestArrayWorld(p.getHeight(), p.getWidth());
+                    world = new TestArrayWorld(p.getWidth(), p.getHeight());
                 } else if (worldType.equals("--long")) {
                     world = new TestPackedWorld(); 
                 } else {
