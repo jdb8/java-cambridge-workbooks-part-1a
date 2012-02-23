@@ -61,5 +61,15 @@ public class AgingWorld extends WorldImpl {
 		if (age > 9) return "_";
 		if (age == 0) return "#";
 		return age+"";
-	}	
+	}
+	
+	@Override
+	protected Color getCellAsColour(int col, int row) {
+	    int age = getCellAge(col, row);
+	    final int[] colors = new int[] 
+	    {00000000,16711680,16717568,16724224,16731136,16738048,16744960,
+	     16751616,16758528,16765440,16772096,16776982,16777062,16777141};
+	    if (age >= colors.length) { return Color.WHITE;}
+	     return new Color(colors[age]);
+	} 
 }
