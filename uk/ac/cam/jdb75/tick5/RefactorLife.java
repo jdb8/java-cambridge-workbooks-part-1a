@@ -40,12 +40,15 @@ public class RefactorLife {
                     world = new ArrayWorld(p.getWidth(), p.getHeight());
                 } else if (worldType.equals("--long")) {
                     world = new PackedWorld(8,8); 
+                } else if (worldType.equals("--aging")) {
+                    world = new AgingWorld(p.getWidth(), p.getHeight()); 
                 } else {
-                    System.out.println("Error: unknown world type supplied. First argument must be either --array or --long");
+                    System.out.println("Error: unknown world type supplied. First argument must be either --array, --long or --aging");
                     return; 
                 }
                 p.initialise(world);
                 play(world);
+                
             }    
                     
         } catch (PatternFormatException e) {
@@ -70,5 +73,6 @@ public class RefactorLife {
             userResponse = System.in.read();
             world = world.nextGeneration(0);
         }
+        viewer.close();
     }
 }
