@@ -73,15 +73,36 @@ public class GuiLife extends JFrame {
 
     public static void main(String[] args) {
         GuiLife gui = new GuiLife();
+        CommandLineOptions options = null;
         try {
-            String url="http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt";
-            List<Pattern> list = PatternLoader.loadFromURL(url);
+            options = new CommandLineOptions(args);
+        } catch (CommandLineException e1) {
+            System.out.println(e1.getMessage());
+            return;
+        }
+        try {
+            String source = options.getSource();
+            List<Pattern> list = null;
+            if (source.startsWith("http://"))
+                try {
+                    list = PatternLoader.loadFromURL(source);
+                } catch (IOException e3) {
+                    System.out.println("Error: The file could not be read");
+                }
+            else
+                try {
+                    list = PatternLoader.loadFromDisk(source);
+                } catch (IOException e2) {
+                    System.out.println("Error: The file could not be read");
+                }
             gui.patternPanel.setPatterns(list);
-            World w = gui.controlPanel.initialiseWorld(list.get(1));
-            gui.gamePanel.display(w);
-        } catch (IOException ioe) {} 
-          catch (PatternFormatException e) {
-            e.getMessage();
+            if (null != options.getIndex()) {
+                World w = gui.controlPanel.initialiseWorld(list.get(options.getIndex()));
+                gui.gamePanel.display(w);
+            }            
+            
+        } catch (PatternFormatException e) {
+            System.out.println(e.getMessage());
         }
         gui.setVisible(true);
     }  
