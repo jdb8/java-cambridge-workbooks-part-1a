@@ -6,12 +6,12 @@ public class ArrayWorld extends WorldImpl {
 
     protected ArrayWorld(int width, int height) {
         super(width, height);
-        cells = new boolean[getHeight()][getWidth()];
+        cells = new boolean[getWidth()][getHeight()];
     }
     
     protected ArrayWorld(ArrayWorld prev) {
         super(prev);
-        cells = new boolean[getHeight()][getWidth()];
+        cells = new boolean[getWidth()][getHeight()];
     }
 
     @Override
