@@ -4,8 +4,8 @@ public class PackedWorld extends WorldImpl {
     
     private long cells;
 
-    protected PackedWorld(int width, int height) {
-        super(width, height);
+    protected PackedWorld() {
+        super(8, 8);
         cells = 0;
     }
     

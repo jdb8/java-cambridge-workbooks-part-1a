@@ -39,7 +39,7 @@ public class RefactorLife {
                 if (worldType.equals("--array")) {
                     world = new ArrayWorld(p.getWidth(), p.getHeight());
                 } else if (worldType.equals("--long")) {
-                    world = new PackedWorld(8,8); 
+                    world = new PackedWorld(); 
                 } else if (worldType.equals("--aging")) {
                     world = new AgingWorld(p.getWidth(), p.getHeight()); 
                 } else {
