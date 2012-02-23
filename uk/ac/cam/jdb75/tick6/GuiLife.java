@@ -1,6 +1,9 @@
 package uk.ac.cam.jdb75.tick6;
 
 import java.awt.BorderLayout;
+import java.io.IOException;
+import java.util.List;
+
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -11,6 +14,9 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
 public class GuiLife extends JFrame {
+    
+    private PatternPanel patternPanel;
+    private ControlPanel controlPanel;
 
     public GuiLife() {
         super("GuiLife");
@@ -52,18 +58,23 @@ public class GuiLife extends JFrame {
     }
 
     private JComponent createPatternPanel() { 
-        JPanel result = new JPanel();
-        addBorder(result, Strings.PANEL_PATTERN);
-        return result;
+        patternPanel = new PatternPanel();
+        addBorder(patternPanel, Strings.PANEL_PATTERN);
+        return patternPanel;
     }
     private JComponent createControlPanel() { 
-        JPanel result = new JPanel();
-        addBorder(result, Strings.PANEL_CONTROL);
-        return result;
+        controlPanel = new ControlPanel();
+        addBorder(controlPanel, Strings.PANEL_CONTROL);
+        return controlPanel;
     }
 
     public static void main(String[] args) {
         GuiLife gui = new GuiLife();
+        try {
+            String url="http://www.cl.cam.ac.uk/teaching/current/ProgJava/life.txt";
+            List<Pattern> list = PatternLoader.loadFromURL(url);
+            gui.patternPanel.setPatterns(list);
+        } catch (IOException ioe) {}
         gui.setVisible(true);
     }  
 }
