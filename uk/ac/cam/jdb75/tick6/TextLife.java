@@ -6,7 +6,6 @@ import java.util.List;
 
 import uk.ac.cam.acr31.life.World;
 
-//TODO: Write a suitable package statement and import statements
 public class TextLife {
 
     public static void main(String[] args) {
@@ -14,7 +13,8 @@ public class TextLife {
         try {
             c = new CommandLineOptions(args);
         } catch (CommandLineException e4) {
-            e4.getMessage();
+            System.out.println(e4.getMessage());
+            return;
         }
         List<Pattern> list = null;
         if (c.getSource().startsWith("http://"))
@@ -22,19 +22,27 @@ public class TextLife {
                 list = PatternLoader.loadFromURL(c.getSource());
             } catch (IOException e3) {
                 System.out.println("Error: The file could not be read");
+                return;
             }
         else
             try {
                 list = PatternLoader.loadFromDisk(c.getSource());
             } catch (IOException e2) {
                 System.out.println("Error: The file could not be read");
+                return;
             }
         if (c.getIndex() == null) {
             int i = 0;
             for (Pattern p : list)
                 System.out.println((i++)+" "+p.getName()+" "+p.getAuthor());
         } else {
-            Pattern p = list.get(c.getIndex());
+            Pattern p = null;
+            try {
+                p = list.get(c.getIndex());
+            } catch (IndexOutOfBoundsException e2) {
+                System.out.println("Error: Pattern number not found in file");
+                return;
+            }
             World w = null;
             if (c.getWorldType().equals(CommandLineOptions.WORLD_TYPE_AGING)) {
                 w = new AgingWorld(p.getWidth(), p.getHeight());
@@ -46,7 +54,8 @@ public class TextLife {
             try {
                 p.initialise(w);
             } catch (PatternFormatException e1) {
-                e1.getMessage();
+                System.out.println(e1.getMessage());
+                return;
             }
             int userResponse = 0;
             while (userResponse != 'q') {

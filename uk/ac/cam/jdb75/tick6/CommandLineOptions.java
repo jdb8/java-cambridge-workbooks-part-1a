@@ -14,16 +14,29 @@ public class CommandLineOptions {
         if (1 == argsLength) {
             source = args[0];
         } else if (2 == argsLength) {
-            source = args[0];
-            index = Integer.parseInt(args[1]);
-            worldType = WORLD_TYPE_ARRAY;
+            if (args[0].startsWith("--")) {
+                source = args[1];
+            } else {
+                source = args[0];
+                try {
+                    index = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    throw new CommandLineException("Error: second argument must be an integer");
+                }
+                worldType = WORLD_TYPE_ARRAY;
+            }
+            
         } else if (3 == argsLength) {
             source = args[1];
-            index = Integer.parseInt(args[2]);
+            try {
+                index = Integer.parseInt(args[2]);
+            } catch (NumberFormatException e) {
+                throw new CommandLineException("Error: third argument must be an integer");
+            }
             String suppliedType = args[0];
-            if (WORLD_TYPE_LONG == suppliedType) { worldType = WORLD_TYPE_LONG; }
-            else if (WORLD_TYPE_AGING == suppliedType) { worldType = WORLD_TYPE_AGING; }
-            else if (WORLD_TYPE_ARRAY == suppliedType) { worldType = WORLD_TYPE_ARRAY; }
+            if (suppliedType.equals(WORLD_TYPE_LONG)) { worldType = WORLD_TYPE_LONG; }
+            else if (suppliedType.equals(WORLD_TYPE_AGING)) { worldType = WORLD_TYPE_AGING; }
+            else if (suppliedType.equals(WORLD_TYPE_ARRAY)) { worldType = WORLD_TYPE_ARRAY; }
             else { throw new CommandLineException("Error: first argument must be either --array, --long, or --aging"); }
         } else {
             throw new CommandLineException("Error: Number of arguments must equal either 1, 2, or 3");
