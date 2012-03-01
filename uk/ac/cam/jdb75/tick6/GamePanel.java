@@ -25,9 +25,6 @@ public class GamePanel extends JPanel {
         current.draw(g, width, height);
         if (zoom > 4) {
             g.setColor(java.awt.Color.LIGHT_GRAY);
-            //TODO: Using for loops call the drawLine method on "g", 
-            //      repeatedly to draw a grid of grey lines to delimit
-            //      the border of the cells in the game board
             for (int col = 0; col<height; col++) {
                 for (int row = 0; row<width; row++) {
                     g.drawLine(col*zoom, row*zoom, col*zoom, height);
