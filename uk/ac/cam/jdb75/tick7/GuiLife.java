@@ -11,6 +11,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
@@ -38,6 +39,23 @@ public class GuiLife extends JFrame {
             world = world.nextGeneration(timeStep);
             gamePanel.display(world);
         }
+    }
+    
+    private void resetWorld() {
+        Pattern current = patternPanel.getCurrentPattern();
+        world = null;
+        if (current != null) {
+            try {
+                world = controlPanel.initialiseWorld(current);
+            } catch (PatternFormatException e) {
+                JOptionPane.showMessageDialog(this,
+                        "Error initialising world",
+                        "An error occurred when initialising the world. "+e.getMessage(),
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        gamePanel.display(world);
+        repaint();
     }
 
     public GuiLife() {
@@ -103,39 +121,8 @@ public class GuiLife extends JFrame {
 
     public static void main(String[] args) {
         GuiLife gui = new GuiLife();
-        CommandLineOptions options = null;
-        try {
-            options = new CommandLineOptions(args);
-        } catch (CommandLineException e1) {
-            System.out.println(e1.getMessage());
-            return;
-        }
-        String source = options.getSource();
-        List<Pattern> list = null;
-        if (source.startsWith("http://"))
-            try {
-                list = PatternLoader.loadFromURL(source);
-            } catch (IOException e3) {
-                System.out.println("Error: The file could not be read");
-            }
-        else
-            try {
-                list = PatternLoader.loadFromDisk(source);
-            } catch (IOException e2) {
-                System.out.println("Error: The file could not be read");
-            }
-        gui.patternPanel.setPatterns(list);
-        if (null != options.getIndex()) {
-            try {
-                gui.world = gui.controlPanel.initialiseWorld(list.get(options.getIndex()));
-            } catch (PatternFormatException e) {
-                e.getMessage();
-            }
-            gui.gamePanel.display(gui.world);
-        }
         gui.playTimer.start();
+        gui.resetWorld();
         gui.setVisible(true);
-    }
-    
-    
+    }   
 }
