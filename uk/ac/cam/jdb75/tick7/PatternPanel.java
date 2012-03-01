@@ -11,15 +11,26 @@ import javax.swing.JScrollPane;
 public class PatternPanel extends JPanel {
 
     private JList guiList;
+    private Pattern currentPattern;
+    
+    public Pattern getCurrentPattern() {
+        return currentPattern;
+    }
  
     public PatternPanel() {
         super();
+        currentPattern = null;
         setLayout(new BorderLayout());
         guiList = new JList();
         add(new JScrollPane(guiList));
     }
 
     public void setPatterns(List<Pattern> list) {
+        if (list == null) {
+            currentPattern = null; //if list is null, then no valid pattern
+            guiList.setListData(new String[]{}); //no list item to select
+            return;
+        }
         ArrayList<String> names = new ArrayList<String>();
 
         //      Using a for loop which iterates over the items
@@ -37,5 +48,7 @@ public class PatternPanel extends JPanel {
         }
   
         guiList.setListData(names.toArray());
+        currentPattern = list.get(0); //select first element in list
+        guiList.setSelectedIndex(0);  //select first element in guiList
     } 
 }
