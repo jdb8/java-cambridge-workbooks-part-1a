@@ -3,6 +3,8 @@ package uk.ac.cam.jdb75.tick7;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -92,7 +95,41 @@ public class GuiLife extends JFrame {
     }
 
     private JComponent createSourcePanel() {
-        JPanel result = new SourcePanel();
+        JPanel result = new SourcePanel(){
+            protected boolean setSourceFile() {
+                JFileChooser chooser = new JFileChooser();
+                int returnVal = chooser.showOpenDialog(this);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File f = chooser.getSelectedFile();
+                    try {
+                        List<Pattern> list = PatternLoader.load(new FileReader(f));
+                        patternPanel.setPatterns(list);
+                        resetWorld();
+                        return true;
+                    } catch (IOException ioe) {}
+                }
+                return false;
+            }
+            protected boolean setSourceNone() {
+                world = null;
+                patternPanel.setPatterns(null);
+                resetWorld();
+                return true;
+            }
+            protected boolean setSourceLibrary() {
+                String u = "http://www.cl.cam.ac.uk/teaching/current/ProgJava/nextlife.txt";
+                return setSourceWeb(u);
+            }
+            private boolean setSourceWeb(String url) {
+                try {
+                    List<Pattern> list = PatternLoader.loadFromURL(url);
+                    patternPanel.setPatterns(list);
+                    resetWorld();
+                    return true;
+                } catch (IOException ioe) {}
+                return false;
+            }
+        };
         addBorder(result,Strings.PANEL_SOURCE);
         return result; 
     }
@@ -111,7 +148,6 @@ public class GuiLife extends JFrame {
                 timeStep = value;
             }
             protected void onZoomChange(int value) {
-                System.out.println(value);
                 gamePanel.setZoom(value);
             }
         };
