@@ -135,7 +135,11 @@ public class GuiLife extends JFrame {
     }
 
     private JComponent createPatternPanel() { 
-        patternPanel = new PatternPanel();
+        patternPanel = new PatternPanel(){
+            public void onPatternChange(){
+                resetWorld();
+            }
+        };
         addBorder(patternPanel, Strings.PANEL_PATTERN);
         return patternPanel;
     }

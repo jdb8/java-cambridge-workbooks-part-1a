@@ -7,11 +7,14 @@ import java.util.List;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-public class PatternPanel extends JPanel {
+public abstract class PatternPanel extends JPanel {
 
     private JList guiList;
     private Pattern currentPattern;
+    private List<Pattern> patternList;    
     
     public Pattern getCurrentPattern() {
         return currentPattern;
@@ -23,10 +26,22 @@ public class PatternPanel extends JPanel {
         setLayout(new BorderLayout());
         guiList = new JList();
         add(new JScrollPane(guiList));
+        guiList.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting() && (patternList != null)) {
+                    int sel = guiList.getSelectedIndex();
+                    if (sel != -1) {
+                        currentPattern = patternList.get(sel);
+                        onPatternChange();
+                    }
+                }
+            }
+        });
     }
 
     public void setPatterns(List<Pattern> list) {
-        if (list == null) {
+        patternList = list;
+        if (patternList == null) {
             currentPattern = null; //if list is null, then no valid pattern
             guiList.setListData(new String[]{}); //no list item to select
             return;
@@ -43,12 +58,14 @@ public class PatternPanel extends JPanel {
         //
         //      to "names" using the method "add" on "names".
         
-        for (Pattern p : list) {
+        for (Pattern p : patternList) {
             names.add(p.getName() + " (" + p.getAuthor() + ")");
         }
   
         guiList.setListData(names.toArray());
-        currentPattern = list.get(0); //select first element in list
+        currentPattern = patternList.get(0); //select first element in list
         guiList.setSelectedIndex(0);  //select first element in guiList
     } 
+    
+    public abstract void onPatternChange();
 }
