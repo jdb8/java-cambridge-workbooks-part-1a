@@ -16,4 +16,5 @@ public class Strings {
     public static final String STORAGE_LONG = "Long";
     public static final String STORAGE_ARRAY = "Array";
     public static final String STORAGE_AGING = "Aging";
+    public static final String STORAGE_HASH = "Hash";
 }
