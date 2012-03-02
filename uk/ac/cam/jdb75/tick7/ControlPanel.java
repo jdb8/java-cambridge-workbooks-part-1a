@@ -43,7 +43,7 @@ public abstract class ControlPanel extends JPanel {
         super();
         setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
         
-        zoomSlider = createNewSlider(1,20,10,Strings.CONTROL_ZOOM);
+        zoomSlider = createNewSlider(1,20,10,Strings.CONTROL_ZOOM + " ");
         zoomSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (!zoomSlider.getValueIsAdjusting())
@@ -51,7 +51,7 @@ public abstract class ControlPanel extends JPanel {
             }
         });
         add(Box.createVerticalStrut(10)); //add 10px of extra space
-        stepSlider = createNewSlider(0,10,0,Strings.CONTROL_STEP);
+        stepSlider = createNewSlider(0,10,0,Strings.CONTROL_STEP + "   ");
         stepSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (!stepSlider.getValueIsAdjusting())
@@ -59,7 +59,7 @@ public abstract class ControlPanel extends JPanel {
             }
         });
         add(Box.createVerticalStrut(10)); //add 10px of extra space
-        speedSlider = createNewSlider(0,100,0,Strings.CONTROL_SPEED);
+        speedSlider = createNewSlider(0,100,49,Strings.CONTROL_SPEED);
         speedSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 if (!speedSlider.getValueIsAdjusting())
