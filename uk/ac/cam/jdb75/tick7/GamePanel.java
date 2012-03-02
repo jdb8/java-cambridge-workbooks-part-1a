@@ -29,13 +29,12 @@ public class GamePanel extends JPanel {
         current.draw(g, width, height);
         if (zoom > 4) {
             g.setColor(java.awt.Color.LIGHT_GRAY);
-            for (int col = 0; col<height; col++) {
-                for (int row = 0; row<width; row++) {
-                    g.drawLine(col*zoom, row*zoom, col*zoom, height);
-                    g.drawLine(col*zoom, row*zoom, width, row*zoom);
-                }
-               
+            for (int col = 1; col<width; col++) {
+                g.drawLine(0, col*zoom, width, col*zoom);
             }
+            for (int row = 1; row<height; row++) {
+                g.drawLine(row*zoom, 0, row*zoom, height);
+            }              
         }
     }
 
