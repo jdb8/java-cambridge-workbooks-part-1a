@@ -35,7 +35,8 @@ public class AnimatedLife {
         } catch (IOException e) {
             System.out.println("Error: There was a problem writing to the disk.");
             return;
-        }        
+        }
+        System.out.println("Operation complete: " + filename);
     }
     
     public static boolean getCell(boolean[][] world, int col, int row) {

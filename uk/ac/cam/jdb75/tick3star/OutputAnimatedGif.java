@@ -25,10 +25,10 @@ public class OutputAnimatedGif {
     private BufferedImage makeFrame(boolean[][] world) {
         int w = world[0].length; // assuming a rectangular or square board - no weird shapes!
         int h = world.length;
-        int cellSize = 20; // size of each cell square
+        int cellSize = 5; // size of each cell square
         float s = 0.8f; // colour saturation 
         float b = 0.3f; // colour brightness
-        int cellMemory = 10;
+        int cellMemory = 100;
         
         if (prevIntWorld == null) {
             prevIntWorld = new int[h][w];
@@ -42,25 +42,29 @@ public class OutputAnimatedGif {
         BufferedImage image = new BufferedImage(w*cellSize, h*cellSize, BufferedImage.TYPE_INT_RGB);
         Graphics g = image.getGraphics(); //create a new graphics context
         
-        g.setColor(c);
+        //g.setColor(c);
+        g.setColor(Color.black);
         g.fillRect(0, 0, w*cellSize, h*cellSize); // set the background with the current HSB value
         
         for (int row = 0; row < world.length; row++) {
             for (int col = 0; col < world[row].length; col++) {
                 float cur = (float)prevIntWorldCopy[row][col];
-                if (cur != 0) {
+                if (cur != 0) { 
                     cur -= 1;
                     prevIntWorld[row][col] -= 1;
-                    g.setColor(new Color(255, 255, 255, (int)(70/10 *cur)));
+                    //g.setColor(new Color(255, 255, 255, (int)(70/10 *cur))); // cur ranges from 1-9
+                    g.setColor(Color.getHSBColor(cur*0.02f, 0.6f, cur*0.005f));
                     g.fillRect(col*cellSize, row*cellSize, cellSize, cellSize);
                 }
                 if (AnimatedLife.getCell(world, col, row)) {
-                    g.setColor(Color.black);
-                    g.fillRect(col*cellSize+2, row*cellSize+2, cellSize, cellSize); // shadow
                     g.setColor(Color.white);
-                    g.fillRect(col*cellSize, row*cellSize, cellSize, cellSize);
-                    g.setColor(Color.black);
-                    g.drawRect(col*cellSize, row*cellSize, cellSize, cellSize); //border
+                    //g.fillRect(col*cellSize+1, row*cellSize+1, cellSize, cellSize); // shadow
+                    
+                    g.setColor(Color.getHSBColor(0f, 0.6f, 0.6f));
+                    g.fillRect(col*cellSize, row*cellSize, cellSize, cellSize); // cell
+                    
+                    g.setColor(Color.white);
+                    //g.drawRect(col*cellSize, row*cellSize, cellSize, cellSize); // border
                     prevIntWorld[row][col] = cellMemory;
                 }                
             }
