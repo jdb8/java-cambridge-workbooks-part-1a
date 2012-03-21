@@ -81,9 +81,9 @@ public class StatisticsLife {
                 largestPopulationName = stats.name;
             }
             
-            System.out.println("TESTING - curLongestCycle: " + stats.name + " (" + curLongestCycle + ")");
-            System.out.println("TESTING - getLoopStart: " + stats.name + " (" + stats.getLoopStart() + ")");
-            System.out.println("TESTING - getLoopEnd: " + stats.name + " (" + stats.getLoopEnd() + ")");
+            //System.out.println("TESTING - curLongestCycle: " + stats.name + " (" + curLongestCycle + ")");
+            //System.out.println("TESTING - getLoopStart: " + stats.name + " (" + stats.getLoopStart() + ")");
+            //System.out.println("TESTING - getLoopEnd: " + stats.name + " (" + stats.getLoopEnd() + ")");
             
             stats.clear();
         }

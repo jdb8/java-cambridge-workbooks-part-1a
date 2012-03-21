@@ -12,9 +12,9 @@ public class Statistics {
     private boolean[][] initialWorld;
     private boolean[][] currentWorld;
     private ArrayList<boolean[][]> previousWorlds = new ArrayList<boolean[][]>();
-    private int max = 1000; // max iterations
+    private int max = 100; // max iterations - results vary depending on this value!
     
-    public void clear() {
+    public void clear() { // used for avoiding heap overflow
         previousWorlds.clear();
     }
     
@@ -48,12 +48,13 @@ public class Statistics {
         for (int i = 0; i < max; i++) {
             prevAlive = alive;
             next();
-            test = ((alive - prevAlive)/prevAlive);
+            test = (prevAlive == 0) ? 0 : ((alive - prevAlive)/prevAlive); // discount infinities
             if (test > rate) {
                 rate = test;
             }
         }
         currentWorld = initialWorld;
+        clear();
         return rate;
         
     }
@@ -64,12 +65,13 @@ public class Statistics {
         for (int i = 0; i < max; i++) {
             prevAlive = alive;
             next();
-            test = ((prevAlive - alive)/prevAlive);
+            test = (prevAlive == 0) ? 0 : ((prevAlive - alive)/prevAlive); // discount infinities
             if (test > rate) {
                 rate = test;
             }
         }
         currentWorld = initialWorld;
+        clear();
         return rate;
         
     }
@@ -80,6 +82,7 @@ public class Statistics {
             for (boolean[][] world: previousWorlds) {
                 if (Arrays.deepEquals(currentWorld, world)) {
                     currentWorld = initialWorld;
+                    clear();
                     return start;
                 }
                 start++;
@@ -87,20 +90,25 @@ public class Statistics {
             next();
         }
         currentWorld = initialWorld;
+        clear();
         return -1;       
     }
     
     public int getLoopEnd() {
+        int end = 0;
         for(int i = 0; i < max; i++) {
-            for (boolean[][] world: previousWorlds) {
+            end += 1;
+            for (boolean[][] world: previousWorlds) {                
                 if (Arrays.deepEquals(currentWorld, world)) {
-                    //currentWorld = initialWorld;
-                    return previousWorlds.indexOf(currentWorld);
+                    currentWorld = initialWorld;
+                    clear();
+                    return (end - 2);
                 }                
             }
             next();
         }
         currentWorld = initialWorld;
+        clear();
         return -1;
         
     }
@@ -114,6 +122,7 @@ public class Statistics {
             next();
         }
         currentWorld = initialWorld;
+        clear();
         return maxLive;        
     }
 
