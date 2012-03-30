@@ -57,7 +57,7 @@ public class Pattern {
                 char[] chars = cellsArray[row].toCharArray();
                 for (int col = 0; col<chars.length; col++) {
                     if (chars[col] == '1') {
-                        world.setCell(row+startRow, col+startCol, true);
+                        world.setCell(col+startCol, row+startRow, true);
                     }
                     else if (chars[col] == '0') { /* do nothing */ }
                     else {
