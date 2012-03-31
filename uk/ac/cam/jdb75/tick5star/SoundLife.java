@@ -20,7 +20,7 @@ public class SoundLife {
             int generations = Integer.parseInt(args[1]);
             String filename = args[2];
             
-            ArrayWorld aWorld = new ArrayWorld(p.getHeight(), p.getWidth());
+            ArrayWorld aWorld = new ArrayWorld(p.getWidth(), p.getHeight());
             p.initialise(aWorld);
             System.out.println(aWorld.getPopulation());
             
