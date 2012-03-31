@@ -1,15 +1,13 @@
 package uk.ac.cam.jdb75.tick5star;
 
-import uk.ac.cam.acr31.life.World;
-import uk.ac.cam.acr31.life.WorldViewer;
-import java.util.List;
+import uk.ac.cam.acr31.sound.SoundOverflowException;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Writer;
-import java.io.OutputStreamWriter;
 
 public class SoundLife {
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException, IOException, SoundOverflowException {
         
         try {
             
@@ -21,6 +19,13 @@ public class SoundLife {
             Pattern p = new Pattern(args[0]);
             int generations = Integer.parseInt(args[1]);
             String filename = args[2];
+            
+            ArrayWorld aWorld = new ArrayWorld(p.getHeight(), p.getWidth());
+            p.initialise(aWorld);
+            System.out.println(aWorld.getPopulation());
+            
+            GenerateWav wav = new GenerateWav(aWorld, generations, filename);
+            wav.create();
             
             
         } catch (PatternFormatException e) {
