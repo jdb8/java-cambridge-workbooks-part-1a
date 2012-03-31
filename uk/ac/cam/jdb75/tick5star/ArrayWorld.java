@@ -43,8 +43,8 @@ public class ArrayWorld extends WorldImpl {
     @Override
     public int getPopulation() {
         int population = 0;
-        for (int row = 0; row < cells.length; row++) {
-            for (int col = 0; col < cells[row].length; col++) {
+        for (int row = 0; row < getHeight(); row++) {
+            for (int col = 0; col < getWidth(); col++) {
                 population += getCell(col, row) ? 1 : 0;
             }
         }
