@@ -43,13 +43,6 @@ public class StatisticsPanel extends JPanel {
         minPopulation.setText("Minimum Population: " + stats.getMinPopulation());
         maxGrowthRate.setText("Maximum Growth Rate: " + stats.getMaxGrowthRate());
         maxDeathRate.setText("Maximum Death Rate: " + stats.getMaxDeathRate());
-        
-        add(generation);
-        add(population);
-        add(maxPopulation);
-        add(minPopulation);
-        add(maxGrowthRate);
-        add(maxDeathRate);
     }
     
     public void reset() {
