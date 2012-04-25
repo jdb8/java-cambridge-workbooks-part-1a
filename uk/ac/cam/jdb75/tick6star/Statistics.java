@@ -10,6 +10,8 @@ public class Statistics {
     private int minPopulation = 0;
     private double maxGrowthRate = 0;
     private double maxDeathRate = 0;
+    private int populationChange = 0;
+    private double growthChange = 0;
     
     private int prevAlive; // number of cells previously alive
     private World currentWorld;
@@ -56,6 +58,20 @@ public class Statistics {
         return maxDeathRate;
     }
     
+    /**
+     * @return the populationChange
+     */
+    public int getPopulationChange() {
+        return populationChange;
+    }
+    
+    /**
+     * @return the growthChange
+     */
+    public double getGrowthChange() {
+        return growthChange;
+    }
+    
     public Statistics(World world) {
         currentWorld = world;
         minPopulation = liveCells();
@@ -80,6 +96,8 @@ public class Statistics {
         currentPopulation = liveCells();
         double newMaxGrowthRate = (double)Math.round(calcMaximumGrowthRate() * 10000) / 10000;
         double newMaxDeathRate = (double)Math.round(calcMaximumDeathRate() * 10000) / 10000;
+        populationChange = (generation == 1) ? 0 : currentPopulation - prevAlive;
+        growthChange = newMaxGrowthRate;
         if (currentPopulation > maxPopulation) {
             maxPopulation = currentPopulation;
         }
@@ -100,7 +118,7 @@ public class Statistics {
         return result;     
     }
     
-    public double calcMaximumDeathRate() {
+    private double calcMaximumDeathRate() {
         double result = (prevAlive == 0) ? 0 : ( (double)(prevAlive - currentPopulation) / (double)prevAlive ); // discount infinities
         return result;        
     }   

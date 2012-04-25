@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
@@ -45,6 +46,7 @@ public class GuiLife extends JFrame {
             world = world.nextGeneration(timeStep);
             statisticsPanel.update(world);
             gamePanel.display(world);
+            repaint();
         }
     }
     
@@ -68,7 +70,7 @@ public class GuiLife extends JFrame {
 
     public GuiLife() {
         super("GuiLife");
-        setSize(640, 480);
+        setSize(940, 480);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         JComponent optionsPanel = createOptionsPanel();
@@ -76,6 +78,7 @@ public class GuiLife extends JFrame {
         JComponent gamePanel = createGamePanel();
         add(gamePanel, BorderLayout.CENTER);
         JComponent statisticsPanel = createStatisticsPanel();
+        
         add(statisticsPanel, BorderLayout.EAST);
     }
 
