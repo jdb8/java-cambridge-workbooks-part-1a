@@ -3,10 +3,6 @@ package uk.ac.cam.jdb75.tick5star;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-
-import uk.ac.cam.acr31.life.World;
 import uk.ac.cam.acr31.sound.AudioSequence;
 import uk.ac.cam.acr31.sound.SineWaveSound;
 import uk.ac.cam.acr31.sound.SoundOverflowException;

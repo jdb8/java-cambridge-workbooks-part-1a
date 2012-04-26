@@ -7,7 +7,6 @@ import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,9 +14,6 @@ import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import uk.ac.cam.acr31.life.World;
 
 public class Graph extends JPanel {
     

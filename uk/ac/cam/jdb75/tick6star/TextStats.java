@@ -1,8 +1,5 @@
 package uk.ac.cam.jdb75.tick6star;
 
-import java.awt.BorderLayout;
-
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 

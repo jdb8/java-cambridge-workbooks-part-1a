@@ -1,6 +1,5 @@
 package uk.ac.cam.jdb75.tick6star;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
