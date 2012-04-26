@@ -3,7 +3,6 @@ package uk.ac.cam.jdb75.tick7star;
 import java.awt.Dimension;
 import java.awt.Graphics;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import uk.ac.cam.acr31.life.World;
@@ -38,6 +37,16 @@ public class FilmStripElement extends JPanel {
                     g.fillRect(col*zoom, row*zoom, zoom, zoom);
                 }
             }
+        }
+        
+        if (zoom > 6) {
+            g.setColor(java.awt.Color.LIGHT_GRAY);
+            for (int col = 0; col<width; col++) {
+                g.drawLine(0, col*zoom, width, col*zoom);
+            }
+            for (int row = 0; row<height; row++) {
+                g.drawLine(row*zoom, 0, row*zoom, height);
+            }              
         }
     }    
 }

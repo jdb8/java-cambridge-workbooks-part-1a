@@ -1,36 +1,25 @@
 package uk.ac.cam.jdb75.tick7star;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
-
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 
 import uk.ac.cam.acr31.life.World;
 
-public class GuiLife extends JFrame {
+public class Editor extends JFrame {
     
     private PatternOptionsPanel patternOptionsPanel;
     private GamePanel gamePanel;
     private FilmStripPanel filmStripPanel;
     private World world;    
 
-    public GuiLife() throws PatternFormatException {
+    public Editor() throws PatternFormatException {
         super("GuiLife");
         setSize(640, 520);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -136,7 +125,7 @@ public class GuiLife extends JFrame {
         sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         return sp;
-       }
+    }
 
     private void addBorder(JComponent component, String title) {
         Border etch = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
@@ -151,12 +140,15 @@ public class GuiLife extends JFrame {
 
             @Override
             public void toggleCell(World current, int x, int y) {
+                Pattern p = patternOptionsPanel.pattern;
+                // ignore clicks on areas out of bounds
+                if (y-p.getStartRow() < 0 || x-p.getStartCol() < 0) { return; };
+                String cells = p.getCells();
+                String[] cellsArray = cells.split(" ");                
                 boolean live = current.getCell(x, y);
                 current.setCell(x, y, !live);
-                Pattern p = patternOptionsPanel.pattern;
-                String cells = p.getCells();
-                String[] cellsArray = cells.split(" ");
-                if (y-p.getStartRow() < 0 || x-p.getStartCol() < 0) { return; };
+                
+                
                 if (y-p.getStartRow() > cellsArray.length-1) {
                     String[] newArray = new String[y-p.getStartRow()+1];
                     Arrays.fill(newArray, "0");
@@ -191,7 +183,7 @@ public class GuiLife extends JFrame {
     }   
 
     public static void main(String[] args) throws PatternFormatException {
-        GuiLife gui = new GuiLife();
+        Editor gui = new Editor();
         Pattern p = new Pattern("::8:8:0:0:0");
         gui.world = new ArrayWorld(p.getWidth(), p.getHeight());
         p.initialise(gui.world);

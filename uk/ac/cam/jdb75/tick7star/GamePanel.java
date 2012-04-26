@@ -20,8 +20,6 @@ public abstract class GamePanel extends JPanel {
         addMouseListener(new MouseAdapter(){ 
             public void mousePressed(MouseEvent me) { 
              java.awt.Point p = me.getPoint();
-             System.out.println("X="+p.x+" Y="+p.y);
-             System.out.println(p.x/zoom + ", " + p.y/zoom);
              toggleCell(current, p.x/zoom, p.y/zoom);
             } 
         });

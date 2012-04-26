@@ -1,9 +1,5 @@
 package uk.ac.cam.jdb75.tick7star;
 
-import java.awt.Graphics;
-
-import javax.swing.Box;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import uk.ac.cam.acr31.life.World;
@@ -28,7 +24,6 @@ public class FilmStripPanel extends JPanel {
             add(new FilmStripElement(world));
             
         } 
-        repaint();
         revalidate();
     }    
     
