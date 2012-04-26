@@ -29,7 +29,7 @@ public class GenerateWav {
         double pitch = (double)currentWorld.getPopulation()/(double)(currentWorld.getHeight()*(double)currentWorld.getWidth());
         System.out.println(pitch + " = " + currentWorld.getPopulation() + " / " + currentWorld.getHeight() + " * " + currentWorld.getWidth());
         
-        as.addSound(new SineWaveSound(pitch*3, 0.5));      
+        as.addSound(new SineWaveSound(pitch*7, 0.5));      
     }
     
     private void addSlots() {
